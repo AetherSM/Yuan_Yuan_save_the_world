@@ -47,4 +47,8 @@ public interface ErrandService {
      * @return 订单列表
      */
     List<ErrandOrder> listRunnerOrders(Long runnerId);
+
+    List<ErrandOrder> searchErrands(Long userId, Long runnerId, Integer status);
+
+    void updateErrandStatusByAdmin(Long orderId, Integer status);
 }

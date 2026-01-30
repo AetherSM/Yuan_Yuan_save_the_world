@@ -33,4 +33,10 @@ public interface UserMapper {
      * 更新余额
      */
     void updateBalance(Long userId, java.math.BigDecimal newBalance);
+
+    List<UserEntity> search(String phone, String nickname, Integer userType, Integer status);
+
+    void updateStatus(Long userId, Integer status);
+
+    void updateUserType(Long userId, Integer userType);
 }

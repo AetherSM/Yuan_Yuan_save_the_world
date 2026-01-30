@@ -48,6 +48,20 @@ const statusText = (s) => ({
   4: '已完成',
   5: '已取消'
 }[s] || '未知')
+const cancel = async (orderNo) => {
+  try {
+    const { data } = await http.post(`/orders/${orderNo}/cancel`, { cancelReason: '用户取消' })
+    if (data && data.code === 1) { ElMessage.success('已取消'); await load() }
+    else { ElMessage.error(data?.msg || '取消失败') }
+  } catch (e) { ElMessage.error('请求失败') }
+}
+const confirm = async (orderNo) => {
+  try {
+    const { data } = await http.post(`/orders/${orderNo}/confirm`)
+    if (data && data.code === 1) { ElMessage.success('已确认收货'); await load() }
+    else { ElMessage.error(data?.msg || '确认失败') }
+  } catch (e) { ElMessage.error('请求失败') }
+}
 </script>
 
 <template>
@@ -75,6 +89,10 @@ const statusText = (s) => ({
         <div>收货人 {{ o.contactName }}（{{ o.contactPhone }}）</div>
       </div>
       <div class="desc">地址：{{ o.deliveryAddress }}</div>
+      <div class="ops">
+        <button v-if="o.orderStatus===1" class="btn gray" @click="cancel(o.orderNo)">取消订单</button>
+        <button v-if="o.orderStatus===3" class="btn" @click="confirm(o.orderNo)">确认收货</button>
+      </div>
     </div>
     <div v-if="!loading && list.length===0" class="empty">暂无订单</div>
     <div v-if="error" class="error">{{ error }}</div>
@@ -92,6 +110,7 @@ const statusText = (s) => ({
 .desc{color:#6b7280;font-size:14px}
 .btn{padding:8px 12px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
 .btn.gray{background:#e5e7eb;color:#111827}
+.ops{display:flex;gap:8px;margin-top:8px}
 .empty{padding:24px;text-align:center;color:#999}
 .error{padding:12px;color:#d33}
 </style>

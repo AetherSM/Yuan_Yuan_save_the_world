@@ -190,4 +190,19 @@ public class UserServiceImpl implements UserService {
     public List<UserEntity> findAllUsers() {
         return userMapper.findAllUsers();
     }
+
+    @Override
+    public List<UserEntity> searchUsers(String phone, String nickname, Integer userType, Integer status) {
+        return userMapper.search(phone, nickname, userType, status);
+    }
+
+    @Override
+    public void updateUserStatus(Long userId, Integer status) {
+        userMapper.updateStatus(userId, status);
+    }
+
+    @Override
+    public void updateUserType(Long userId, Integer userType) {
+        userMapper.updateUserType(userId, userType);
+    }
 }

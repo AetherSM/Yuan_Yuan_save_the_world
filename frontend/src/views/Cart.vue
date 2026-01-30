@@ -18,9 +18,14 @@ const load = async () => {
   }
 }
 onMounted(load)
-const changeQty = async (pid, q) => {
+const changeQty = async (pid, q, stock) => {
   try {
-    const { data } = await http.put(`/api/cart/${pid}`, null, { params: { quantity: Math.max(1, q) } })
+    let next = Math.max(1, q)
+    if (typeof stock === 'number' && stock >= 0 && next > stock) {
+      next = stock
+      ElMessage.error('超过库存，已调整为最大可购数量')
+    }
+    const { data } = await http.put(`/api/cart/${pid}`, null, { params: { quantity: next } })
     if (data && data.code === 1) await load()
     else ElMessage.error(data?.msg || '更新数量失败')
   } catch (e) { ElMessage.error('请求失败') }
@@ -79,9 +84,10 @@ const total = () => items.value.reduce((sum, x) => {
         <div class="info">
           <div class="name">{{ x.product?.productName || '商品' }}</div>
           <div class="price">¥{{ x.product?.price || '-' }}</div>
+          <div class="stock">库存：{{ x.product?.stock ?? '-' }}</div>
         </div>
         <div class="qty-box">
-          <input type="number" min="1" :value="x.cartItem.quantity" @change="changeQty(x.product.productId, Number($event.target.value))" />
+          <input type="number" min="1" :max="x.product?.stock ?? undefined" :value="x.cartItem.quantity" @change="changeQty(x.product.productId, Number($event.target.value), x.product?.stock)" />
         </div>
         <button class="btn gray" @click="removeItem(x.product.productId)">移除</button>
       </div>
@@ -112,6 +118,7 @@ const total = () => items.value.reduce((sum, x) => {
 .info{flex:1}
 .name{font-weight:600}
 .price{color:#ef4444}
+.stock{color:#6b7280;font-size:12px;margin-top:4px}
 .qty-box input{width:80px;padding:8px;border:1px solid #e5e7eb;border-radius:10px}
 .btn{padding:10px 16px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
 .btn.gray{background:#e5e7eb;color:#111827}

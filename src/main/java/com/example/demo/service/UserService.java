@@ -41,4 +41,10 @@ public interface UserService {
      * @return 用户列表
      */
     List<UserEntity> findAllUsers();
+
+    List<UserEntity> searchUsers(String phone, String nickname, Integer userType, Integer status);
+
+    void updateUserStatus(Long userId, Integer status);
+
+    void updateUserType(Long userId, Integer userType);
 }

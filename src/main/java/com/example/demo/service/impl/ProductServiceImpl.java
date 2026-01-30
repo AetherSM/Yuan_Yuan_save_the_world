@@ -118,6 +118,15 @@ public class ProductServiceImpl implements ProductService {
         productMapper.updateStock(productId, stock, delta);
     }
 
+    @Override
+    public void updateStatusByAdmin(Long productId, Integer status) {
+        Product existing = productMapper.findById(productId);
+        if (existing == null) {
+            throw new NotExistException(Messages.PRODUCT_NOT_FOUND);
+        }
+        productMapper.updateStatus(productId, status);
+    }
+
     private String writeImages(List<String> images) {
         if (images == null) {
             return null;

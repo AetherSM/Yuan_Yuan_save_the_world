@@ -67,4 +67,31 @@
     <update id="updateBalance">
         update users set balance = #{newBalance}, update_time = now() where user_id = #{userId}
     </update>
+
+    <select id="search" resultMap="BaseResultMap">
+        select * from users
+        <where>
+            <if test="phone != null and phone != ''">
+                and phone like concat('%', #{phone}, '%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname like concat('%', #{nickname}, '%')
+            </if>
+            <if test="userType != null">
+                and user_type = #{userType}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <update id="updateStatus">
+        update users set status = #{status}, update_time = now() where user_id = #{userId}
+    </update>
+
+    <update id="updateUserType">
+        update users set user_type = #{userType}, update_time = now() where user_id = #{userId}
+    </update>
 </mapper>

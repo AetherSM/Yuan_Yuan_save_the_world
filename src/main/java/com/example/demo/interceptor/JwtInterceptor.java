@@ -5,6 +5,8 @@ import com.example.demo.context.BaseContext;
 import com.example.demo.expection.TokenNullException;
 import com.example.demo.properties.JwtProperties;
 import com.example.demo.utils.JwtUtil;
+import com.example.demo.pojo.entity.UserEntity;
+import com.example.demo.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Autowired
     private JwtProperties jwtProperties;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -63,6 +68,16 @@ public class JwtInterceptor implements HandlerInterceptor {
             request.setAttribute("userId", userId);
             String username = (String) claims.get(JwtClaimsConstant.USERNAME);
             request.setAttribute("username", username);
+
+            // 检查管理员权限
+            if (request.getRequestURI().startsWith("/admin")) {
+                UserEntity user = userService.findById(userId);
+                if (user == null || user.getUserType() != 0) {
+                    response.setStatus(403); // Forbidden
+                    return false;
+                }
+            }
+
             log.info("令牌校验通过，userId={}", userId);
             return true;
         } catch (Exception e) {

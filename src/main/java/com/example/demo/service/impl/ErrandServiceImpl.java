@@ -59,4 +59,14 @@ public class ErrandServiceImpl implements ErrandService {
     public List<ErrandOrder> listRunnerOrders(Long runnerId) {
         return errandOrderMapper.listByRunner(runnerId);
     }
+
+    @Override
+    public List<ErrandOrder> searchErrands(Long userId, Long runnerId, Integer status) {
+        return errandOrderMapper.search(userId, runnerId, status);
+    }
+
+    @Override
+    public void updateErrandStatusByAdmin(Long orderId, Integer status) {
+        errandOrderMapper.updateStatusById(orderId, status);
+    }
 }

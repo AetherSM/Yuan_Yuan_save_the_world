@@ -24,12 +24,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**") // 拦截所有请求
                 .excludePathPatterns(
-                        "/auth/register",  // 排除注册接口
                         "/auth/login",     // 排除登录接口
-                        "/auth/query",     // 排除查询接口（如果需要公开访问）
-                        "/auth/query/**" ,  // 排除查询接口（如果需要公开访问）
-                        "/swagger-ui.html",
-                        "/v3/api-docs"
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
                 );
     }
 

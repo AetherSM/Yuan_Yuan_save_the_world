@@ -14,4 +14,8 @@ public interface ErrandOrderMapper {
     List<ErrandOrder> listByStatus(Integer status);
     List<ErrandOrder> listByUser(@Param("userId") Long userId, @Param("status") Integer status);
     List<ErrandOrder> listByRunner(Long runnerId);
+
+    List<ErrandOrder> search(@Param("userId") Long userId, @Param("runnerId") Long runnerId, @Param("status") Integer status);
+
+    void updateStatusById(@Param("orderId") Long orderId, @Param("status") Integer status);
 }

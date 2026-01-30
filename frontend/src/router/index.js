@@ -13,6 +13,9 @@ import Addresses from '../views/Addresses.vue'
 import Coupons from '../views/Coupons.vue'
 import Cart from '../views/Cart.vue'
 import ShoppingRecords from '../views/ShoppingRecords.vue'
+import AdminLayout from '../views/AdminLayout.vue'
+import AdminUsers from '../views/AdminUsers.vue'
+import AdminProducts from '../views/AdminProducts.vue'
 
 const routes = [
   { path: '/', redirect: '/shop' },
@@ -34,7 +37,17 @@ const routes = [
   { path: '/shop/:id', component: ProductDetail, meta: { requiresAuth: true } },
   { path: '/cart', component: Cart, meta: { requiresAuth: true } }
   ,
-  { path: '/records', component: ShoppingRecords, meta: { requiresAuth: true } }
+  { path: '/records', component: ShoppingRecords, meta: { requiresAuth: true } },
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      { path: '', redirect: '/admin/users' },
+      { path: 'users', component: AdminUsers },
+      { path: 'products', component: AdminProducts },
+    ]
+  }
 ]
 
 const router = createRouter({

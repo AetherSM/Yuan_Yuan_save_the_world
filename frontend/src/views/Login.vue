@@ -21,7 +21,9 @@ const submit = async () => {
       }
       
       const type = data.data.user.userType
-      if (type === 2) {
+      if (type === 0) {
+        router.push('/admin')
+      } else if (type === 2) {
         router.push('/errands')
       } else if (type === 3) {
         router.push('/merchant/orders')

@@ -62,4 +62,6 @@ public interface ProductService {
      * @param sellerId 卖家ID
      */
     void adjustStock(Long productId, Integer stock, Integer delta, Long sellerId);
+
+    void updateStatusByAdmin(Long productId, Integer status);
 }

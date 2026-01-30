@@ -33,6 +33,8 @@ const tabs = computed(() => {
   ]
 })
 
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+
 const keyword = ref('')
 const refreshAuth = async () => {
   const token = localStorage.getItem('token')
@@ -74,7 +76,8 @@ const logout = async () => {
 </script>
 
 <template>
-  <div class="mobile-layout">
+  <router-view v-if="isAdminRoute" />
+  <div v-else class="mobile-layout">
     <header class="m-header">
       <div class="logo">校园购</div>
       <div class="user" v-if="loggedIn">
