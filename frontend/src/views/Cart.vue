@@ -8,13 +8,20 @@ const items = ref([]) // { cartItem: {...}, product: {...} }
 const addresses = ref([])
 const addressId = ref(null)
 const checkoutVisible = ref(false)
+const loading = ref(false)
+const error = ref('')
+
 const load = async () => {
+  loading.value = true
+  error.value = ''
   try {
     const { data } = await http.get('/api/cart')
     if (data && data.code === 1) items.value = data.data || []
-    else ElMessage.error(data?.msg || '加载购物车失败')
+    else error.value = data?.msg || '加载购物车失败'
   } catch (e) {
-    ElMessage.error('请求失败')
+    error.value = '请求失败'
+  } finally {
+    loading.value = false
   }
 }
 onMounted(load)
@@ -77,25 +84,55 @@ const total = () => items.value.reduce((sum, x) => {
 </script>
 
 <template>
-  <div>
-    <h2>购物车</h2>
-    <div class="list">
-      <div v-for="x in items" :key="x.product.productId" class="row">
-        <div class="info">
-          <div class="name">{{ x.product?.productName || '商品' }}</div>
-          <div class="price">¥{{ x.product?.price || '-' }}</div>
-          <div class="stock">库存：{{ x.product?.stock ?? '-' }}</div>
-        </div>
-        <div class="qty-box">
-          <input type="number" min="1" :max="x.product?.stock ?? undefined" :value="x.cartItem.quantity" @change="changeQty(x.product.productId, Number($event.target.value), x.product?.stock)" />
-        </div>
-        <button class="btn gray" @click="removeItem(x.product.productId)">移除</button>
+  <div class="page">
+    <div class="page-card toolbar">
+      <div class="toolbar-left">
+        <div class="title">购物车</div>
+        <div class="muted">查看已加入的商品并一键结算</div>
+      </div>
+      <div class="toolbar-right">
+        <el-button type="info" plain @click="load" :loading="loading">刷新</el-button>
       </div>
     </div>
-    <div class="summary">
-      <div>合计：¥{{ total().toFixed(2) }}</div>
-      <button class="btn" @click="openCheckout">去结算</button>
+
+    <div v-if="error" class="page-card">
+      <el-alert type="error" :closable="false" :title="error" />
     </div>
+
+    <el-skeleton v-if="loading" animated :rows="4" class="page-card" />
+
+    <div v-else-if="items.length === 0" class="page-card">
+      <el-empty description="购物车还是空的，去逛逛吧" />
+    </div>
+
+    <div v-else class="page-card">
+      <div class="list">
+        <div v-for="x in items" :key="x.product.productId" class="row">
+          <div class="info">
+            <div class="name">{{ x.product?.productName || '商品' }}</div>
+            <div class="meta">
+              <span class="price">¥{{ x.product?.price || '-' }}</span>
+              <span class="stock">库存：{{ x.product?.stock ?? '-' }}</span>
+            </div>
+          </div>
+          <div class="qty-box">
+            <el-input-number
+              :model-value="x.cartItem.quantity"
+              :min="1"
+              :max="x.product?.stock ?? undefined"
+              size="small"
+              @change="val => changeQty(x.product.productId, Number(val), x.product?.stock)"
+            />
+          </div>
+          <el-button size="small" type="danger" text @click="removeItem(x.product.productId)">移除</el-button>
+        </div>
+      </div>
+      <div class="summary">
+        <div>合计：<span class="sum">¥{{ total().toFixed(2) }}</span></div>
+        <el-button type="primary" @click="openCheckout">去结算</el-button>
+      </div>
+    </div>
+
     <el-dialog v-model="checkoutVisible" title="选择收货地址" width="520px">
       <div class="addr-list">
         <label v-for="a in addresses" :key="a.addressId" class="addr-item">
@@ -105,7 +142,7 @@ const total = () => items.value.reduce((sum, x) => {
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <button class="btn" @click="checkout">支付</button>
+          <el-button type="primary" @click="checkout">支付</el-button>
         </div>
       </template>
     </el-dialog>
@@ -114,15 +151,14 @@ const total = () => items.value.reduce((sum, x) => {
 
 <style scoped>
 .list{display:flex;flex-direction:column;gap:8px}
-.row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+.row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .info{flex:1}
-.name{font-weight:600}
-.price{color:#ef4444}
-.stock{color:#6b7280;font-size:12px;margin-top:4px}
-.qty-box input{width:80px;padding:8px;border:1px solid #e5e7eb;border-radius:10px}
-.btn{padding:10px 16px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
-.btn.gray{background:#e5e7eb;color:#111827}
-.summary{display:flex;justify-content:flex-end;gap:12px;align-items:center;margin-top:12px}
+.name{font-weight:600;color:#111827}
+.meta{color:#6b7280;font-size:12px;margin-top:4px;display:flex;gap:10px;align-items:center}
+.price{color:#ef4444;font-weight:600}
+.stock{color:#9ca3af}
+.summary{display:flex;justify-content:flex-end;gap:12px;align-items:center;margin-top:16px;border-top:1px solid #f3f4f6;padding-top:10px}
+.sum{color:#ef4444;font-weight:800}
 .addr-list{display:flex;flex-direction:column;gap:8px}
 .addr-item{display:flex;gap:8px;align-items:center}
 </style>

@@ -38,22 +38,33 @@ const addToCart = async (id) => {
 </script>
 
 <template>
-  <div>
-    <div class="jd-header">
+  <div class="page">
+    <div class="page-card jd-header">
       <div class="logo">校园购</div>
       <div class="search">
-        <input v-model="keyword" placeholder="搜索商品关键词" />
-        <button class="search-btn" @click="load">搜索</button>
+        <el-input v-model="keyword" placeholder="搜索商品关键词" clearable @keyup.enter="load" />
+        <el-button type="primary" @click="load">搜索</el-button>
       </div>
       <div class="sort">
-        <label>排序：</label>
-        <select v-model="order" @change="load">
-          <option value="desc">最新</option>
-          <option value="asc">最早</option>
-        </select>
+        <span>排序：</span>
+        <el-select v-model="order" style="width:120px" @change="load">
+          <el-option label="最新" value="desc" />
+          <el-option label="最早" value="asc" />
+        </el-select>
       </div>
     </div>
-    <div class="grid">
+
+    <div v-if="error" class="page-card">
+      <el-alert type="error" :closable="false" :title="error" />
+    </div>
+
+    <el-skeleton v-if="loading" animated :rows="6" class="page-card" />
+
+    <div v-else-if="list.length===0" class="page-card">
+      <el-empty description="暂无商品" />
+    </div>
+
+    <div v-else class="grid">
       <div v-for="p in list" :key="p.productId" class="card">
         <router-link :to="`/shop/${p.productId}`" class="thumb">
           <img :src="p.mainImage || 'https://via.placeholder.com/320x200?text=Product'" alt="" />
@@ -69,24 +80,24 @@ const addToCart = async (id) => {
             <span class="tag green">满减</span>
           </div>
           <div class="actions">
-            <button class="btn primary" @click="addToCart(p.productId)" :disabled="addToCartLoading">加入购物车</button>
-            <router-link :to="`/shop/${p.productId}`" class="btn">查看详情</router-link>
+            <el-button type="danger" size="small" @click="addToCart(p.productId)" :loading="addToCartLoading">
+              加入购物车
+            </el-button>
+            <router-link :to="`/shop/${p.productId}`">
+              <el-button size="small">查看详情</el-button>
+            </router-link>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="!loading && list.length===0" class="empty">暂无商品</div>
-    <div v-if="error" class="error">{{ error }}</div>
   </div>
 </template>
 
 <style scoped>
-.jd-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+.jd-header{display:flex;align-items:center;gap:12px}
 .logo{font-weight:700;color:#111827}
-.search{flex:1;display:flex;gap:8px}
-.search input{flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px}
-.search-btn{padding:10px 16px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
-.sort select{padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+.search{flex:1;display:flex;gap:8px;align-items:center}
+.sort{display:flex;align-items:center;gap:6px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
 .card{border:1px solid #e5e7eb;border-radius:12px;background:#fff;overflow:hidden;transition:all .2s}
 .card:hover{box-shadow:0 8px 24px rgba(0,0,0,.06);transform:translateY(-2px)}
@@ -101,8 +112,4 @@ const addToCart = async (id) => {
 .tag.red{border-color:#ef4444;color:#ef4444}
 .tag.green{border-color:#10b981;color:#10b981}
 .actions{display:flex;gap:8px;margin-top:8px}
-.btn{padding:8px 12px;border:none;border-radius:10px;background:#e5e7eb;color:#111827;cursor:pointer;text-align:center}
-.btn.primary{background:#ff1f2d;color:#fff}
-.empty{padding:24px;text-align:center;color:#999}
-.error{padding:12px;color:#d33}
 </style>

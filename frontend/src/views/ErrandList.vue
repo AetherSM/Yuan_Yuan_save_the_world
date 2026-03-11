@@ -41,43 +41,54 @@ const goCreate = () => {
 </script>
 
 <template>
-  <div>
-    <div class="toolbar">
-      <div class="title-bar">跑腿广场</div>
-      <button v-if="userType===1" class="btn publish" @click="goCreate">发布跑腿</button>
-    </div>
-    <div class="grid">
-    <div v-for="item in list" :key="item.orderId" class="card">
-      <div class="row">
-        <div class="title">{{ item.title }}</div>
-        <div class="status">待接单</div>
+  <div class="page">
+    <div class="page-card toolbar">
+      <div class="toolbar-left">
+        <div class="title">跑腿广场</div>
+        <div class="muted">找人帮忙 / 接单赚钱</div>
       </div>
-      <div class="desc">{{ item.description }}</div>
-      <div class="row">
-        <div>赏金 ¥{{ item.reward }}</div>
-        <div>联系人 {{ item.contact_name || item.contactName }}</div>
-      </div>
-      <div class="row">
-        <button v-if="userType===2" class="btn" @click="take(item.orderNo)">接单</button>
+      <div class="toolbar-right">
+        <el-button v-if="userType===1" type="danger" @click="goCreate">发布跑腿</el-button>
+        <el-button type="info" plain @click="load" :loading="loading">刷新</el-button>
       </div>
     </div>
-    <div v-if="!loading && list.length===0" class="empty">暂无数据</div>
-    <div v-if="error" class="error">{{ error }}</div>
+
+    <div v-if="error" class="page-card">
+      <el-alert type="error" :closable="false" :title="error" />
+    </div>
+
+    <el-skeleton v-if="loading" animated :rows="6" class="page-card" />
+
+    <div v-else-if="list.length===0" class="page-card">
+      <el-empty description="暂无可接跑腿任务" />
+    </div>
+
+    <div v-else class="grid">
+      <div v-for="item in list" :key="item.orderId" class="card">
+        <div class="row">
+          <div class="title2">{{ item.title }}</div>
+          <el-tag type="warning">待接单</el-tag>
+        </div>
+        <div class="desc">{{ item.description }}</div>
+        <div class="row meta">
+          <div>赏金 <span class="money">¥{{ item.reward }}</span></div>
+          <div>联系人 {{ item.contact_name || item.contactName }}</div>
+        </div>
+        <div class="ops">
+          <el-button v-if="userType===2" type="primary" @click="take(item.orderNo)">接单</el-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.title-bar{font-weight:700;color:#111827}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.card{padding:12px;border:1px solid #eee;border-radius:8px;background:#fff}
+.card{padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
 .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
-.title{font-weight:600}
-.status{color:#42b883}
-.desc{color:#666;font-size:14px}
-.btn{padding:8px 12px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
-.btn.publish{background:#ff1f2d}
-.empty{padding:24px;text-align:center;color:#999}
-.error{padding:12px;color:#d33}
+.title2{font-weight:700;color:#111827}
+.desc{color:#4b5563;font-size:14px;line-height:1.5;min-height:38px}
+.meta{color:#6b7280;font-size:13px}
+.money{color:#ef4444;font-weight:800}
+.ops{display:flex;justify-content:flex-end;margin-top:10px}
 </style>

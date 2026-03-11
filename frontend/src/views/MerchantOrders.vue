@@ -6,6 +6,7 @@ import { ElMessage } from 'element-plus'
 const list = ref([])
 const loading = ref(false)
 const error = ref('')
+const status = ref(null)
 
 const statusMap = {
   1: '待支付',
@@ -18,7 +19,10 @@ const statusMap = {
 const load = async () => {
   loading.value = true
   try {
-    const { data } = await http.get('/orders/seller')
+    const params = {
+      status: status.value ?? null,
+    }
+    const { data } = await http.get('/orders/seller', { params })
     if (data && data.code === 1) {
       list.value = data.data || []
     } else {
@@ -49,21 +53,38 @@ onMounted(load)
 </script>
 
 <template>
-  <div>
-    <div class="header">
-      <h2>订单管理</h2>
-      <button class="btn gray" @click="load">刷新</button>
+  <div class="page">
+    <div class="page-card toolbar">
+      <div class="toolbar-left">
+        <div class="title">订单管理</div>
+        <div class="muted">查看并处理店铺订单</div>
+      </div>
+      <div class="toolbar-right">
+        <el-select v-model="status" placeholder="状态筛选" style="width:150px" clearable>
+          <el-option :value="null" label="全部状态" />
+          <el-option v-for="(label, key) in statusMap" :key="key" :value="Number(key)" :label="label" />
+        </el-select>
+        <el-button type="info" plain @click="load" :loading="loading">刷新</el-button>
+      </div>
     </div>
-    
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="list.length === 0" class="empty">暂无订单</div>
-    
+
+    <div v-if="error" class="page-card">
+      <el-alert type="error" :closable="false" :title="error" />
+    </div>
+
+    <el-skeleton v-if="loading" animated :rows="6" class="page-card" />
+
+    <div v-else-if="list.length === 0" class="page-card">
+      <el-empty description="暂无订单" />
+    </div>
+
     <div v-else class="list">
       <div v-for="item in list" :key="item.orderId" class="card">
         <div class="row header-row">
           <span>订单号: {{ item.orderNo }}</span>
-          <span class="status">{{ statusMap[item.orderStatus] }}</span>
+          <el-tag :type="item.orderStatus===4 ? 'success' : item.orderStatus===5 ? 'info' : 'warning'">
+            {{ statusMap[item.orderStatus] }}
+          </el-tag>
         </div>
         <div class="row">
           <div class="amount">总额: ¥{{ item.totalAmount }}</div>
@@ -73,8 +94,15 @@ onMounted(load)
           <div>收货人: {{ item.contactName }} {{ item.contactPhone }}</div>
           <div>地址: {{ item.deliveryAddress }}</div>
         </div>
-        <div class="ops" v-if="item.orderStatus === 2">
-          <button class="btn primary" @click="ship(item.orderNo)">确认发货</button>
+        <div class="ops">
+          <el-button
+            v-if="item.orderStatus === 2"
+            type="primary"
+            size="small"
+            @click="ship(item.orderNo)"
+          >
+            确认发货
+          </el-button>
         </div>
       </div>
     </div>
@@ -82,19 +110,12 @@ onMounted(load)
 </template>
 
 <style scoped>
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .list{display:flex;flex-direction:column;gap:12px}
-.card{padding:12px;border:1px solid #eee;border-radius:8px;background:#fff}
+.card{padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
 .row{display:flex;justify-content:space-between;margin-bottom:8px}
 .header-row{border-bottom:1px solid #f5f5f5;padding-bottom:8px;margin-bottom:8px;font-size:13px;color:#666}
-.status{color:#42b883;font-weight:600}
 .amount{font-weight:600;font-size:16px;color:#333}
 .time{font-size:12px;color:#999}
 .address-box{background:#f9f9f9;padding:8px;border-radius:4px;font-size:13px;color:#555;margin-bottom:8px}
 .ops{text-align:right;border-top:1px solid #f5f5f5;padding-top:8px}
-.btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer}
-.btn.gray{background:#f3f4f6;color:#333}
-.btn.primary{background:#42b883;color:#fff}
-.loading,.empty,.error{padding:20px;text-align:center;color:#999}
-.error{color:#d33}
 </style>
