@@ -31,4 +31,27 @@
     <select id="listByUser" resultMap="BaseResultMap">
         select * from complaints where complainant_id = #{userId} order by create_time desc
     </select>
+
+    <select id="listAll" resultMap="BaseResultMap">
+        select * from complaints
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="orderType != null">
+                and order_type = #{orderType}
+            </if>
+            <if test="startTime != null">
+                and create_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="countByStatus" resultType="java.util.Map">
+        select status, count(*) as count from complaints group by status
+    </select>
 </mapper>

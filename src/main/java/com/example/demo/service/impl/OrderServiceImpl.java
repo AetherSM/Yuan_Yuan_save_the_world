@@ -214,6 +214,28 @@ public class OrderServiceImpl implements OrderService {
         return orderItemMapper.listByOrderId(orderId);
     }
 
+    @Override
+    public List<ProductOrder> adminSearchAll(String orderNo, Long userId, Long sellerId, Integer status) {
+        return productOrderMapper.searchAll(orderNo, userId, sellerId, status);
+    }
+
+    @Override
+    public void adminUpdateStatus(String orderNo, Integer status, String cancelReason) {
+        if (!StringUtils.hasText(orderNo)) {
+            throw new IllegalArgumentException("订单号不能为空");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("订单状态不能为空");
+        }
+        ProductOrder order = productOrderMapper.findByOrderNo(orderNo);
+        if (order == null) {
+            throw new IllegalArgumentException("订单不存在");
+        }
+        // 若强制取消，允许写入取消原因
+        String reason = (status == 5) ? cancelReason : null;
+        productOrderMapper.updateStatus(orderNo, status, reason);
+    }
+
     private String genOrderNo() {
         return "PO" + LocalDateTime.now().format(ORDER_NO_FMT) + (1000 + RANDOM.nextInt(9000));
     }

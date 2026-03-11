@@ -16,6 +16,11 @@ import ShoppingRecords from '../views/ShoppingRecords.vue'
 import AdminLayout from '../views/AdminLayout.vue'
 import AdminUsers from '../views/AdminUsers.vue'
 import AdminProducts from '../views/AdminProducts.vue'
+import AdminErrands from '../views/AdminErrands.vue'
+import AdminComplaints from '../views/AdminComplaints.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
+import AdminOrders from '../views/AdminOrders.vue'
+import AdminRoleApplications from '../views/AdminRoleApplications.vue'
 
 const routes = [
   { path: '/', redirect: '/shop' },
@@ -43,9 +48,13 @@ const routes = [
     component: AdminLayout,
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
-      { path: '', redirect: '/admin/users' },
+      { path: '', component: AdminDashboard },
       { path: 'users', component: AdminUsers },
       { path: 'products', component: AdminProducts },
+      { path: 'orders', component: AdminOrders },
+      { path: 'role-applications', component: AdminRoleApplications },
+      { path: 'errands', component: AdminErrands },
+      { path: 'complaints', component: AdminComplaints },
     ]
   }
 ]
@@ -60,6 +69,13 @@ router.beforeEach((to, from, next) => {
   if (to.path !== '/login' && to.meta?.requiresAuth && !token) {
     next('/login')
   } else {
+    if (to.meta?.requiresAdmin) {
+      const userType = Number(localStorage.getItem('userType') || 1)
+      if (userType !== 0) {
+        next('/shop')
+        return
+      }
+    }
     next()
   }
 })

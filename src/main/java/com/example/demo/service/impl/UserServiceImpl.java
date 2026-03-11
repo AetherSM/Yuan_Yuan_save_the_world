@@ -203,6 +203,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserType(Long userId, Integer userType) {
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        Integer currentType = user.getUserType();
+        // 不允许通过此接口直接修改管理员角色
+        if (currentType != null && currentType == 0 && (userType == null || userType != 0)) {
+            throw new IllegalArgumentException("不能直接修改管理员的角色，请通过审批流程处理");
+        }
+        // 不允许直接把普通用户升为管理员
+        if ((currentType == null || currentType != 0) && userType != null && userType == 0) {
+            throw new IllegalArgumentException("不能直接将用户设置为管理员，请通过角色申请审批");
+        }
         userMapper.updateUserType(userId, userType);
     }
 }

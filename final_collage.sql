@@ -400,6 +400,30 @@ create table complaints
 create index idx_complainant
     on complaints (complainant_id);
 
+-- 角色申请表
+create table role_applications
+(
+    id            bigint auto_increment primary key,
+    user_id       bigint                              not null comment '用户ID',
+    current_type  tinyint                             null comment '当前角色',
+    target_type   tinyint                             not null comment '目标角色',
+    reason        varchar(255)                        not null comment '申请理由',
+    status        tinyint   default 0                 not null comment '状态:0-待审核,1-通过,2-拒绝',
+    handler_id    bigint                              null comment '审核管理员ID',
+    handle_remark varchar(255)                        null comment '审核备注',
+    create_time   timestamp default CURRENT_TIMESTAMP null,
+    update_time   timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    constraint role_applications_ibfk_1
+        foreign key (user_id) references users (user_id)
+)
+    comment '角色申请表';
+
+create index idx_role_applications_user
+    on role_applications (user_id);
+
+create index idx_role_applications_status
+    on role_applications (status);
+
 -- 评价回复表
 create table review_replies
 (

@@ -77,4 +77,14 @@ public interface OrderService {
      * @return 订单项列表
      */
     List<OrderItem> listItems(Long orderId);
+
+    /**
+     * 管理员：搜索全平台订单
+     */
+    List<ProductOrder> adminSearchAll(String orderNo, Long userId, Long sellerId, Integer status);
+
+    /**
+     * 管理员：强制修改订单状态（可用于取消/推进状态）
+     */
+    void adminUpdateStatus(String orderNo, Integer status, String cancelReason);
 }

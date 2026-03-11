@@ -23,7 +23,7 @@ public class ErrandServiceImpl implements ErrandService {
     @Override
     public void createOrder(ErrandOrder order) {
         order.setOrderNo("EO" + LocalDateTime.now().format(ORDER_NO_FMT) + (1000 + RANDOM.nextInt(9000)));
-        order.setOrderStatus(1); // 待接单
+        order.setOrderStatus(0); // 待审核
         errandOrderMapper.insert(order);
     }
 

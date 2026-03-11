@@ -69,6 +69,25 @@
         select * from product_orders where order_no = #{orderNo}
     </select>
 
+    <select id="searchAll" resultMap="BaseResultMap">
+        select * from product_orders
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="sellerId != null">
+                and seller_id = #{sellerId}
+            </if>
+            <if test="status != null">
+                and order_status = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
     <select id="listByUser" resultMap="BaseResultMap">
         select * from product_orders
         <where>

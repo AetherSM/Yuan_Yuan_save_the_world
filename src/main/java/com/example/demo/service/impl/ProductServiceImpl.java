@@ -60,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
         p.setMainImage(dto.getMainImage());
         p.setImages(writeImages(dto.getImages()));
         p.setShippingAddress(dto.getShippingAddress());
-        p.setStatus(dto.getStatus() == null ? 1 : dto.getStatus());
+        p.setStatus(dto.getStatus() == null ? 2 : dto.getStatus());
         p.setCreateTime(LocalDateTime.now());
         p.setUpdateTime(LocalDateTime.now());
         productMapper.insert(p);

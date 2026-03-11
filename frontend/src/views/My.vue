@@ -7,12 +7,19 @@ import MyOrders from './MyOrders.vue'
 import ShoppingRecords from './ShoppingRecords.vue'
 import Addresses from './Addresses.vue'
 import Wallet from './Wallet.vue'
+import RoleApply from './RoleApply.vue'
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref('orders')
 const syncFromQuery = () => {
   const t = route.query.tab
-  activeTab.value = (t === 'wallet') ? 'wallet' : (t === 'errands' ? 'errands' : (t === 'records' ? 'records' : (t === 'addresses' ? 'addresses' : 'orders')))
+  activeTab.value =
+    t === 'wallet' ? 'wallet'
+    : t === 'errands' ? 'errands'
+    : t === 'records' ? 'records'
+    : t === 'addresses' ? 'addresses'
+    : t === 'roles' ? 'roles'
+    : 'orders'
 }
 onMounted(syncFromQuery)
 watch(() => route.query.tab, syncFromQuery)
@@ -38,6 +45,7 @@ const logout = async () => {
       <button class="tab" :class="{active: activeTab==='records'}" @click="switchTab('records')">购物记录</button>
       <button class="tab" :class="{active: activeTab==='addresses'}" @click="switchTab('addresses')">地址管理</button>
       <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">钱包充值</button>
+      <button class="tab" :class="{active: activeTab==='roles'}" @click="switchTab('roles')">角色申请</button>
       <button class="tab danger" @click="logout">退出登录</button>
     </div>
     <div class="panel">
@@ -45,7 +53,8 @@ const logout = async () => {
       <MyOrders v-else-if="activeTab==='errands'" />
       <ShoppingRecords v-else-if="activeTab==='records'" />
       <Addresses v-else-if="activeTab==='addresses'" />
-      <Wallet v-else />
+      <Wallet v-else-if="activeTab==='wallet'" />
+      <RoleApply v-else />
     </div>
   </div>
 </template>

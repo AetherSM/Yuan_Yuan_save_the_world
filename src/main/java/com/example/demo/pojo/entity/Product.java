@@ -34,8 +34,8 @@ public class Product {
     private String images; // JSON string
     @Schema(description = "发货地址")
     private String shippingAddress;
-    @Schema(description = "状态: 0-下架 1-上架")
-    private Integer status; // 0-下架 1-上架
+    @Schema(description = "状态: 0-下架 1-上架 2-待审核 3-审核拒绝")
+    private Integer status; // 0-下架 1-上架 2-待审核 3-审核拒绝
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

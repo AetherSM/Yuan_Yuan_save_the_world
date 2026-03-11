@@ -6,6 +6,7 @@ import com.example.demo.service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ComplaintServiceImpl implements ComplaintService {
@@ -32,5 +33,15 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public List<Complaint> listMyComplaints(Long userId) {
         return complaintMapper.listByUser(userId);
+    }
+
+    @Override
+    public List<Complaint> listAllComplaints(Map<String, Object> params) {
+        return complaintMapper.listAll(params);
+    }
+
+    @Override
+    public List<Map<String, Object>> countComplaintsByStatus() {
+        return complaintMapper.countByStatus();
     }
 }

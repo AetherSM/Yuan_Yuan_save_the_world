@@ -22,6 +22,11 @@ public interface ProductOrderMapper {
 
     ProductOrder findByOrderNo(@Param("orderNo") String orderNo);
 
+    List<ProductOrder> searchAll(@Param("orderNo") String orderNo,
+                                 @Param("userId") Long userId,
+                                 @Param("sellerId") Long sellerId,
+                                 @Param("status") Integer status);
+
     List<ProductOrder> listByUser(@Param("userId") Long userId,
                                   @Param("status") Integer status);
 

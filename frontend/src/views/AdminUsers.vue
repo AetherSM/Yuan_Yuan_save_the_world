@@ -45,12 +45,15 @@
     <el-dialog v-model="editModalVisible" title="编辑用户">
       <el-form label-width="80px">
         <el-form-item label="角色">
-          <el-select v-model="currentUser.userType">
+          <el-select v-model="currentUser.userType" :disabled="currentUser.userType === 0">
             <el-option label="管理员" :value="0" />
             <el-option label="普通用户" :value="1" />
             <el-option label="跑腿员" :value="2" />
             <el-option label="商家" :value="3" />
           </el-select>
+          <div v-if="currentUser.userType === 0" style="font-size:12px;color:#9ca3af;margin-top:4px;">
+            管理员角色不能直接修改，如需变更请通过角色申请审批。
+          </div>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="currentUser.status">
@@ -116,12 +119,16 @@ const openEditModal = (user) => {
 const saveUser = async () => {
   try {
     await http.patch(`/admin/users/${currentUser.value.userId}/status`, { status: currentUser.value.status })
-    await http.patch(`/admin/users/${currentUser.value.userId}/type`, { userType: currentUser.value.userType })
+    // 仅当不是管理员时才允许直接改角色
+    if (currentUser.value.userType !== 0) {
+      await http.patch(`/admin/users/${currentUser.value.userId}/type`, { userType: currentUser.value.userType })
+    }
     ElMessage.success('保存成功')
     editModalVisible.value = false
     await loadUsers()
   } catch (error) {
-    ElMessage.error('保存失败')
+    const msg = error?.response?.data?.msg || error?.response?.data?.message || error?.message || '保存失败'
+    ElMessage.error(msg)
   }
 }
 

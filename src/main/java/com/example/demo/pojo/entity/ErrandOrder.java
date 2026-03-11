@@ -65,7 +65,7 @@ public class ErrandOrder {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime deadline;
     
-    @Schema(description = "订单状态: 1-待接单, 2-已接单, 3-配送中, 4-已完成, 5-已取消")
+    @Schema(description = "订单状态: 0-待审核, 1-待接单, 2-已接单, 3-配送中, 4-已完成, 5-已取消, 6-审核拒绝")
     private Integer orderStatus; 
     
     @Schema(description = "取消原因")
