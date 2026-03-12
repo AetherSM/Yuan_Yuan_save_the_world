@@ -443,3 +443,26 @@ create table review_replies
 create index idx_review
     on review_replies (review_id);
 
+-- 退款申请表
+create table refund_requests
+(
+    id            bigint auto_increment primary key,
+    order_type    tinyint                             not null comment '订单类型: 1-商品订单, 2-跑腿订单',
+    order_id      bigint                              not null comment '订单ID',
+    order_no      varchar(32)                         not null comment '订单号',
+    applicant_id  bigint                              not null comment '申请人ID(用户)',
+    refund_amount decimal(10, 2)                      not null comment '退款金额',
+    reason        varchar(500)                        null comment '退款原因',
+    status        tinyint   default 0                 not null comment '状态: 0-待处理, 1-已同意, 2-已退款, 3-已拒绝',
+    handler_id    bigint                              null comment '处理人ID(商家/跑腿员/管理员)',
+    handle_remark varchar(255)                        null comment '处理备注',
+    handle_time   timestamp                           null comment '处理时间',
+    create_time   timestamp default CURRENT_TIMESTAMP null,
+    update_time   timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    constraint refund_requests_ibfk_1 foreign key (applicant_id) references users (user_id)
+) comment '退款申请表';
+
+create index idx_refund_order on refund_requests (order_type, order_id);
+create index idx_refund_applicant on refund_requests (applicant_id);
+create index idx_refund_status on refund_requests (status);
+

@@ -72,10 +72,12 @@ public class CartServiceImpl implements CartService {
         List<Map<String, Object>> res = new ArrayList<>();
         for (CartItem ci : items) {
             Product p = productMapper.findById(ci.getProductId());
-            Map<String, Object> m = new HashMap<>();
-            m.put("cartItem", ci);
-            m.put("product", p);
-            res.add(m);
+            if (p != null) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("cartItem", ci);
+                m.put("product", p);
+                res.add(m);
+            }
         }
         return res;
     }

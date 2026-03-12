@@ -58,22 +58,38 @@ const openCheckout = async () => {
 const checkout = async () => {
   if (!addressId.value) { ElMessage.error('请选择地址'); return }
   try {
-    const payloadItems = items.value.map(x => ({ productId: x.product.productId, quantity: x.cartItem.quantity }))
+    const payloadItems = items.value.map(x => ({ productId: x.product?.productId, quantity: x.cartItem?.quantity || 1 })).filter(x => x.productId)
     const dto = { addressId: addressId.value, items: payloadItems }
     const { data } = await http.post('/orders', dto)
     if (data && data.code === 1 && data.data?.orderNo) {
       const orderNo = data.data.orderNo
-      await http.post(`/orders/${orderNo}/pay`)
-      await http.post('/api/cart/clear')
-      ElMessage.success('支付成功')
-      checkoutVisible.value = false
-      await load()
-      router.push({ path: '/my', query: { tab: 'orders' } })
+      try {
+        const payResponse = await http.post(`/orders/${orderNo}/pay`)
+        if (payResponse && payResponse.data && payResponse.data.code === 1) {
+          await http.post('/api/cart/clear')
+          ElMessage.success('支付成功')
+          checkoutVisible.value = false
+          await load()
+          router.push({ path: '/my', query: { tab: 'orders' } })
+        } else {
+          const errorMsg = payResponse?.data?.msg || '支付失败'
+          ElMessage.error(errorMsg)
+          // 支付失败后不跳转，让用户可以重新操作
+          checkoutVisible.value = false
+        }
+      } catch (payError) {
+        // 支付失败，显示后端返回的错误信息（如余额不足）
+        const errorMsg = payError?.response?.data?.msg || payError?.message || '支付失败'
+        ElMessage.error(errorMsg)
+        // 支付失败后不跳转，让用户可以重新操作
+        checkoutVisible.value = false
+      }
     } else {
       ElMessage.error(data?.msg || '下单失败')
     }
   } catch (e) {
-    ElMessage.error('请求失败')
+    const errorMsg = e?.response?.data?.msg || '请求失败'
+    ElMessage.error(errorMsg)
   }
 }
 const total = () => items.value.reduce((sum, x) => {
@@ -107,7 +123,7 @@ const total = () => items.value.reduce((sum, x) => {
 
     <div v-else class="page-card">
       <div class="list">
-        <div v-for="x in items" :key="x.product.productId" class="row">
+        <div v-for="x in items" :key="x.product?.productId || x.cartItem?.productId" class="row">
           <div class="info">
             <div class="name">{{ x.product?.productName || '商品' }}</div>
             <div class="meta">
@@ -117,14 +133,14 @@ const total = () => items.value.reduce((sum, x) => {
           </div>
           <div class="qty-box">
             <el-input-number
-              :model-value="x.cartItem.quantity"
+              :model-value="x.cartItem?.quantity || 1"
               :min="1"
-              :max="x.product?.stock ?? undefined"
+              :max="x.product?.stock > 0 ? x.product.stock : undefined"
               size="small"
-              @change="val => changeQty(x.product.productId, Number(val), x.product?.stock)"
+              @change="val => x.product && changeQty(x.product.productId, Number(val), x.product?.stock)"
             />
           </div>
-          <el-button size="small" type="danger" text @click="removeItem(x.product.productId)">移除</el-button>
+          <el-button size="small" type="danger" text @click="x.product && removeItem(x.product.productId)">移除</el-button>
         </div>
       </div>
       <div class="summary">

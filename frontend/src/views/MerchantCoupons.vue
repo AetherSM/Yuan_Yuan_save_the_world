@@ -83,6 +83,19 @@ const openEditDialog = (coupon) => {
   dialogVisible.value = true
 }
 
+// 格式化时间为后端期望的格式
+const formatDateTime = (date) => {
+  if (!date) return null
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  const hours = String(d.getHours()).padStart(2, '0')
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const seconds = String(d.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
 // 提交表单
 const submitForm = async () => {
   if (!form.value.name.trim()) {
@@ -107,7 +120,12 @@ const submitForm = async () => {
   }
 
   try {
-    const { data } = await http.post('/api/coupons/add', form.value)
+    const submitData = {
+      ...form.value,
+      startTime: formatDateTime(form.value.startTime),
+      endTime: formatDateTime(form.value.endTime)
+    }
+    const { data } = await http.post('/api/coupons/add', submitData)
     if (data && data.code === 1) {
       ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
       dialogVisible.value = false

@@ -1,12 +1,18 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import http from '../services/http'
 import { ElMessage } from 'element-plus'
+
+const router = useRouter()
 const list = ref([])
 const loading = ref(false)
 const error = ref('')
-const status = ref(null) // 1-待支付,2-待发货,3-待收货,4-已完成,5-已取消
+const status = ref(null) // 1-待支付,2-待发货,3-待收货,4-已完成,5-已取消,6-退款中,7-已退款
 const keyword = ref('')
+const refundDialog = ref(false)
+const refundForm = ref({ orderNo: '', orderType: 1, refundAmount: 0, reason: '' })
+const refundSubmitting = ref(false)
 const displayedList = computed(() => {
   const kw = (keyword.value || '').trim().toLowerCase()
   if (!kw) return list.value
@@ -46,8 +52,36 @@ const statusText = (s) => ({
   2: '待发货',
   3: '待收货',
   4: '已完成',
-  5: '已取消'
+  5: '已取消',
+  6: '退款中',
+  7: '已退款'
 }[s] || '未知')
+const canRefund = (o) => [2, 3, 4].includes(o.orderStatus)
+const openRefund = (o) => {
+  refundForm.value = { orderNo: o.orderNo, orderType: 1, refundAmount: Number(o.totalAmount) || 0, reason: '' }
+  refundDialog.value = true
+}
+const submitRefund = async () => {
+  if (!refundForm.value.orderNo || !refundForm.value.refundAmount || refundForm.value.refundAmount <= 0) {
+    ElMessage.warning('请填写退款金额')
+    return
+  }
+  refundSubmitting.value = true
+  try {
+    const { data } = await http.post('/refunds/apply', refundForm.value)
+    if (data && data.code === 1) {
+      ElMessage.success('退款申请已提交')
+      refundDialog.value = false
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '申请失败')
+    }
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.msg || '申请失败')
+  } finally {
+    refundSubmitting.value = false
+  }
+}
 const cancel = async (orderNo) => {
   try {
     const { data } = await http.post(`/orders/${orderNo}/cancel`, { cancelReason: '用户取消' })
@@ -61,6 +95,10 @@ const confirm = async (orderNo) => {
     if (data && data.code === 1) { ElMessage.success('已确认收货'); await load() }
     else { ElMessage.error(data?.msg || '确认失败') }
   } catch (e) { ElMessage.error('请求失败') }
+}
+
+const viewDetail = (orderNo) => {
+  router.push(`/order/${orderNo}`)
 }
 </script>
 
@@ -79,7 +117,7 @@ const confirm = async (orderNo) => {
       <button class="btn gray" @click="load">刷新</button>
       <input class="search" v-model="keyword" placeholder="搜索订单号/地址/联系人" />
     </div>
-    <div v-for="o in displayedList" :key="o.orderId" class="card">
+    <div v-for="o in displayedList" :key="o.orderId" class="card" @click="viewDetail(o.orderNo)" style="cursor: pointer;">
       <div class="row">
         <div class="title">订单号 {{ o.orderNo }}</div>
         <div class="status">{{ statusText(o.orderStatus) }}</div>
@@ -88,12 +126,25 @@ const confirm = async (orderNo) => {
         <div>总金额 ¥{{ o.totalAmount }}</div>
         <div>收货人 {{ o.contactName }}（{{ o.contactPhone }}）</div>
       </div>
+      <div v-if="o.itemSummary" class="items">商品：{{ o.itemSummary }}</div>
       <div class="desc">地址：{{ o.deliveryAddress }}</div>
-      <div class="ops">
+      <div class="ops" @click.stop>
         <button v-if="o.orderStatus===1" class="btn gray" @click="cancel(o.orderNo)">取消订单</button>
         <button v-if="o.orderStatus===3" class="btn" @click="confirm(o.orderNo)">确认收货</button>
+        <button v-if="canRefund(o)" class="btn warn" @click="openRefund(o)">申请退款</button>
       </div>
     </div>
+    <el-dialog v-model="refundDialog" title="申请退款" width="400">
+      <div class="refund-form">
+        <p>订单号：{{ refundForm.orderNo }}</p>
+        <p>退款金额：<el-input-number v-model="refundForm.refundAmount" :min="0.01" :precision="2" size="small" /></p>
+        <p>退款原因：<el-input v-model="refundForm.reason" type="textarea" rows="2" placeholder="选填" /></p>
+      </div>
+      <template #footer>
+        <el-button @click="refundDialog = false">取消</el-button>
+        <el-button type="primary" @click="submitRefund" :loading="refundSubmitting">提交申请</el-button>
+      </template>
+    </el-dialog>
     <div v-if="!loading && list.length===0" class="empty">暂无订单</div>
     <div v-if="error" class="error">{{ error }}</div>
   </div>
@@ -107,10 +158,13 @@ const confirm = async (orderNo) => {
 .title{font-weight:600}
 .status{color:#999}
 .info{color:#374151}
+.items{color:#374151;font-size:14px;margin:6px 0}
 .desc{color:#6b7280;font-size:14px}
 .btn{padding:8px 12px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
 .btn.gray{background:#e5e7eb;color:#111827}
+.btn.warn{background:#f59e0b;color:#fff}
 .ops{display:flex;gap:8px;margin-top:8px}
+.refund-form p{margin:10px 0}
 .empty{padding:24px;text-align:center;color:#999}
 .error{padding:12px;color:#d33}
 </style>

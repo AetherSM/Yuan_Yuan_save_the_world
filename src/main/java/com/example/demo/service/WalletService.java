@@ -18,9 +18,27 @@ public interface WalletService {
     void recharge(Long userId, BigDecimal amount);
 
     /**
+     * 支付扣款：从用户余额中扣除金额并记录流水
+     * @param userId 用户ID
+     * @param amount 扣款金额
+     * @param relatedOrderNo 关联订单号
+     * @param description 描述
+     */
+    void deductForPayment(Long userId, BigDecimal amount, String relatedOrderNo, String description);
+
+    /**
      * 查询交易记录
      * @param userId 用户ID
      * @return 交易记录列表
      */
     List<WalletTransaction> list(Long userId);
+
+    /**
+     * 退款入账：将金额退回用户余额并记录流水
+     * @param userId 用户ID
+     * @param amount 退款金额
+     * @param relatedOrderNo 关联订单号
+     * @param description 描述
+     */
+    void refundToUser(Long userId, java.math.BigDecimal amount, String relatedOrderNo, String description);
 }

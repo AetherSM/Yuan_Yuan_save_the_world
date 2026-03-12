@@ -13,6 +13,7 @@ import com.example.demo.pojo.entity.Product;
 import com.example.demo.pojo.entity.ProductOrder;
 import com.example.demo.pojo.entity.ShoppingRecord;
 import com.example.demo.service.OrderService;
+import com.example.demo.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ShoppingRecordMapper shoppingRecordMapper;
+
+    @Autowired
+    private WalletService walletService;
 
     private static final DateTimeFormatter ORDER_NO_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final Random RANDOM = new Random();
@@ -132,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void pay(String orderNo, Long userId) {
         ProductOrder order = productOrderMapper.findByOrderNo(orderNo);
         if (order == null || !order.getUserId().equals(userId)) {
@@ -140,7 +145,14 @@ public class OrderServiceImpl implements OrderService {
         if (order.getOrderStatus() != 1) {
             throw new IllegalArgumentException("订单状态不允许支付");
         }
+        
+        // 检查余额并扣款（余额不足会抛出异常，事务会自动回滚）
+        walletService.deductForPayment(userId, order.getTotalAmount(), orderNo, "订单支付");
+        
+        // 标记订单为已支付
         productOrderMapper.markPay(orderNo);
+        
+        // 记录购物记录
         List<OrderItem> items = orderItemMapper.listByOrderId(order.getOrderId());
         List<ShoppingRecord> records = new ArrayList<>();
         for (OrderItem oi : items) {
@@ -201,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<ProductOrder> listUserOrders(Long userId, Integer status) {
-        return productOrderMapper.listByUser(userId, status);
+        return productOrderMapper.listByUserWithItemSummary(userId, status);
     }
 
     @Override

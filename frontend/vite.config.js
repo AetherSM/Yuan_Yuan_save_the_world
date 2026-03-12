@@ -4,4 +4,32 @@ import vue from '@vitejs/plugin-vue'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  server: {
+    proxy: {
+      '/auth': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/products': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/addresses': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/orders': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/refunds': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
+  }
 })

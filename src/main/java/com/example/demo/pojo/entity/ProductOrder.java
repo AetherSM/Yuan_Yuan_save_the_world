@@ -26,8 +26,8 @@ public class ProductOrder {
     private String contactName;
     @Schema(description = "联系电话")
     private String contactPhone;
-    @Schema(description = "订单状态: 1-待支付, 2-待发货, 3-待收货, 4-已完成, 5-已取消")
-    private Integer orderStatus; // 1-待支付,2-待发货,3-待收货,4-已完成,5-已取消
+    @Schema(description = "订单状态: 1-待支付, 2-待发货, 3-待收货, 4-已完成, 5-已取消, 6-退款中, 7-已退款")
+    private Integer orderStatus; // 1-5 同上, 6-退款中, 7-已退款
     @Schema(description = "支付时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime payTime;
@@ -47,5 +47,8 @@ public class ProductOrder {
     @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+
+    @Schema(description = "订单商品摘要（展示用，如：可乐 x2；面包 x1）")
+    private String itemSummary;
 }
 

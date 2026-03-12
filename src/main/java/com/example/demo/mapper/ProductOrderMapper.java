@@ -32,5 +32,9 @@ public interface ProductOrderMapper {
 
     List<ProductOrder> listBySeller(@Param("sellerId") Long sellerId,
                                     @Param("status") Integer status);
+
+    /** 列表查询：带订单商品摘要（itemSummary） */
+    List<ProductOrder> listByUserWithItemSummary(@Param("userId") Long userId,
+                                                 @Param("status") Integer status);
 }
 

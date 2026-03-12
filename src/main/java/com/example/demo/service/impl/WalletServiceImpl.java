@@ -46,8 +46,64 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deductForPayment(Long userId, BigDecimal amount, String relatedOrderNo, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("扣款金额必须大于0");
+        }
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        BigDecimal before = user.getBalance() == null ? BigDecimal.ZERO : user.getBalance();
+        if (before.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("余额不足");
+        }
+        BigDecimal after = before.subtract(amount);
+        userMapper.updateBalance(userId, after);
+
+        WalletTransaction tx = new WalletTransaction();
+        tx.setUserId(userId);
+        tx.setTransactionType(2);
+        tx.setAmount(amount);
+        tx.setBalanceBefore(before);
+        tx.setBalanceAfter(after);
+        tx.setRelatedOrderNo(relatedOrderNo);
+        tx.setDescription(description != null ? description : "支付");
+        walletTransactionMapper.insert(tx);
+    }
+
+    @Override
     public List<WalletTransaction> list(Long userId) {
         return walletTransactionMapper.listByUser(userId);
+    }
+
+    /**
+     * 退款入账：将金额退回用户余额并记录一条“退款”流水
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void refundToUser(Long userId, BigDecimal amount, String relatedOrderNo, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("退款金额必须大于0");
+        }
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        BigDecimal before = user.getBalance() == null ? BigDecimal.ZERO : user.getBalance();
+        BigDecimal after = before.add(amount);
+        userMapper.updateBalance(userId, after);
+
+        WalletTransaction tx = new WalletTransaction();
+        tx.setUserId(userId);
+        tx.setTransactionType(5); // 5-退款
+        tx.setAmount(amount);
+        tx.setBalanceBefore(before);
+        tx.setBalanceAfter(after);
+        tx.setRelatedOrderNo(relatedOrderNo);
+        tx.setDescription(description != null ? description : "订单退款");
+        walletTransactionMapper.insert(tx);
     }
 }
 

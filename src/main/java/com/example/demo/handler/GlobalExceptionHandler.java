@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({TokenNullException.class, JwtException.class})
-    public ResponseEntity<Result<Void>> handleAuth(TokenNullException e) {
+    public ResponseEntity<Result<Void>> handleAuth(Exception e) {
         return new ResponseEntity<>(Result.error(e.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 

@@ -130,6 +130,8 @@ const productStatusMap = {
   3: '待收货',
   4: '已完成',
   5: '已取消',
+  6: '退款中',
+  7: '已退款',
 }
 
 const errandStatusMap = {
@@ -140,6 +142,8 @@ const errandStatusMap = {
   4: '已完成',
   5: '已取消',
   6: '审核拒绝',
+  7: '退款中',
+  8: '已退款',
 }
 
 const productStatusTagType = (s) => {

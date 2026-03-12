@@ -21,6 +21,7 @@
         <result column="remark" property="remark"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
+        <result column="item_summary" property="itemSummary"/>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="orderId" keyColumn="order_id">
@@ -95,6 +96,19 @@
             <if test="status != null"> and order_status = #{status} </if>
         </where>
         order by create_time desc
+    </select>
+
+    <select id="listByUserWithItemSummary" resultMap="BaseResultMap">
+        select p.*,
+               group_concat(concat(oi.product_name, ' x ', oi.quantity) separator '；') as item_summary
+        from product_orders p
+        left join order_items oi on p.order_id = oi.order_id
+        <where>
+            p.user_id = #{userId}
+            <if test="status != null"> and p.order_status = #{status} </if>
+        </where>
+        group by p.order_id
+        order by p.create_time desc
     </select>
 
     <select id="listBySeller" resultMap="BaseResultMap">

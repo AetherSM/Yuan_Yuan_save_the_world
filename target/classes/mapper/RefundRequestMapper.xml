@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.RefundRequestMapper">
+    <resultMap id="BaseResultMap" type="com.example.demo.pojo.entity.RefundRequest">
+        <id column="id" property="id"/>
+        <result column="order_type" property="orderType"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="reason" property="reason"/>
+        <result column="status" property="status"/>
+        <result column="handler_id" property="handlerId"/>
+        <result column="handle_remark" property="handleRemark"/>
+        <result column="handle_time" property="handleTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into refund_requests (order_type, order_id, order_no, applicant_id, refund_amount, reason, status, create_time, update_time)
+        values (#{orderType}, #{orderId}, #{orderNo}, #{applicantId}, #{refundAmount}, #{reason}, 0, now(), now())
+    </insert>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select * from refund_requests where id = #{id}
+    </select>
+
+    <select id="listByApplicant" resultMap="BaseResultMap">
+        select * from refund_requests
+        <where>
+            applicant_id = #{applicantId}
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="listBySellerId" resultMap="BaseResultMap">
+        select r.* from refund_requests r
+        inner join product_orders p on r.order_id = p.order_id and r.order_type = 1
+        where p.seller_id = #{sellerId}
+        <if test="status != null">and r.status = #{status}</if>
+        order by r.create_time desc
+    </select>
+
+    <select id="listByRunnerId" resultMap="BaseResultMap">
+        select r.* from refund_requests r
+        inner join errand_orders e on r.order_id = e.order_id and r.order_type = 2
+        where e.runner_id = #{runnerId}
+        <if test="status != null">and r.status = #{status}</if>
+        order by r.create_time desc
+    </select>
+
+    <select id="listAll" resultMap="BaseResultMap">
+        select * from refund_requests
+        <where>
+            <if test="orderType != null">and order_type = #{orderType}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <update id="updateStatus">
+        update refund_requests
+        set status = #{status},
+            handler_id = #{handlerId},
+            handle_remark = #{handleRemark},
+            handle_time = now(),
+            update_time = now()
+        where id = #{id}
+    </update>
+</mapper>

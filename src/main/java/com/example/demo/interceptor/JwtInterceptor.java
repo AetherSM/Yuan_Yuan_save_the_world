@@ -81,9 +81,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             log.info("令牌校验通过，userId={}", userId);
             return true;
         } catch (Exception e) {
-            response.setStatus(401);
             log.info("令牌解析失败: {}", e.getMessage());
-            return false;
+            throw new JwtException("令牌无效或已过期");
         }
 
     }

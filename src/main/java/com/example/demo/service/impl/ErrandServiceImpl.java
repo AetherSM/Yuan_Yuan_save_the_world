@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import com.example.demo.mapper.ErrandOrderMapper;
 import com.example.demo.pojo.entity.ErrandOrder;
 import com.example.demo.service.ErrandService;
+import com.example.demo.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,10 @@ public class ErrandServiceImpl implements ErrandService {
 
     @Autowired
     private ErrandOrderMapper errandOrderMapper;
-    
+
+    @Autowired
+    private WalletService walletService;
+
     private static final DateTimeFormatter ORDER_NO_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final Random RANDOM = new Random();
 
@@ -39,6 +43,24 @@ public class ErrandServiceImpl implements ErrandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeOrder(String orderNo) {
+        ErrandOrder order = errandOrderMapper.findByOrderNo(orderNo);
+        if (order == null) {
+            throw new IllegalArgumentException("订单不存在");
+        }
+        if (order.getOrderStatus() != 3) {
+            throw new IllegalArgumentException("订单状态不允许完成");
+        }
+        
+        // 计算总金额（赏金 + 小费）
+        java.math.BigDecimal totalAmount = order.getReward().add(order.getTip() != null ? order.getTip() : java.math.BigDecimal.ZERO);
+        
+        // 从用户余额中扣除金额并记录流水
+        walletService.deductForPayment(order.getUserId(), totalAmount, orderNo, "跑腿订单支付");
+        
+        // 给跑腿员增加余额并记录流水
+        walletService.refundToUser(order.getRunnerId(), totalAmount, orderNo, "跑腿订单收入");
+        
+        // 更新订单状态为已完成
         int updated = errandOrderMapper.updateStatus(orderNo, 4, null);
         if (updated == 0) {
             throw new IllegalStateException("完成失败");

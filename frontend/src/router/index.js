@@ -15,6 +15,7 @@ import Addresses from '../views/Addresses.vue'
 import Coupons from '../views/Coupons.vue'
 import Cart from '../views/Cart.vue'
 import ShoppingRecords from '../views/ShoppingRecords.vue'
+import OrderDetail from '../views/OrderDetail.vue'
 import AdminLayout from '../views/AdminLayout.vue'
 import AdminUsers from '../views/AdminUsers.vue'
 import AdminProducts from '../views/AdminProducts.vue'
@@ -23,6 +24,7 @@ import AdminComplaints from '../views/AdminComplaints.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminOrders from '../views/AdminOrders.vue'
 import AdminRoleApplications from '../views/AdminRoleApplications.vue'
+import AdminRefunds from '../views/AdminRefunds.vue'
 
 const routes = [
   { path: '/', redirect: '/shop' },
@@ -47,6 +49,7 @@ const routes = [
   { path: '/cart', component: Cart, meta: { requiresAuth: true } }
   ,
   { path: '/records', component: ShoppingRecords, meta: { requiresAuth: true } },
+  { path: '/order/:orderNo', component: OrderDetail, meta: { requiresAuth: true } },
   {
     path: '/admin',
     component: AdminLayout,
@@ -59,6 +62,7 @@ const routes = [
       { path: 'role-applications', component: AdminRoleApplications },
       { path: 'errands', component: AdminErrands },
       { path: 'complaints', component: AdminComplaints },
+      { path: 'refunds', component: AdminRefunds },
     ]
   }
 ]

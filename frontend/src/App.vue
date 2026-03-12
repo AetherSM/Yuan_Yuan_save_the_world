@@ -45,8 +45,8 @@ const refreshAuth = async () => {
   userType.value = Number(localStorage.getItem('userType') || 1)
   const n = localStorage.getItem('nickname') || ''
   nickname.value = n
-  // 若缺少服务端信息，再尝试拉取
-  if (token && !n) {
+  // 只在首次加载且缺少服务端信息时尝试拉取，避免路由切换时频繁请求
+  if (token && !n && !window.hasRefreshedAuth) {
     try {
       const { data } = await http.get('/auth/profile')
       if (data && data.code === 1 && data.data) {
@@ -58,10 +58,17 @@ const refreshAuth = async () => {
         }
       }
     } catch (e) {}
+    window.hasRefreshedAuth = true
   }
 }
 onMounted(refreshAuth)
-watch(() => route.path, refreshAuth)
+watch(() => route.path, () => {
+  // 路由变化时只更新本地状态，不发送请求
+  const token = localStorage.getItem('token')
+  loggedIn.value = !!token
+  userType.value = Number(localStorage.getItem('userType') || 1)
+  nickname.value = localStorage.getItem('nickname') || ''
+})
 const search = () => {
   router.push({ path: '/shop', query: { keyword: keyword.value || '' } })
 }
