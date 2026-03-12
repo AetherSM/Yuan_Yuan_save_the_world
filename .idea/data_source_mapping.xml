@@ -13,8 +13,10 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/OrderItemMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/ProductMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/ProductOrderMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/mapper/RefundRequestMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/ReviewMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/ReviewReplyMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/mapper/RoleApplicationMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/ShoppingRecordMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/UserCouponMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />
     <file url="file://$PROJECT_DIR$/src/main/resources/mapper/UserMapper.xml" value="186864f7-9b46-4373-8bd9-bdc423965d01" />

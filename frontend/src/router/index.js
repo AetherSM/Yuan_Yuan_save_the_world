@@ -23,6 +23,7 @@ import AdminComplaints from '../views/AdminComplaints.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminOrders from '../views/AdminOrders.vue'
 import AdminRoleApplications from '../views/AdminRoleApplications.vue'
+import AdminRefunds from '../views/AdminRefunds.vue'
 
 const routes = [
   { path: '/', redirect: '/shop' },
@@ -59,6 +60,7 @@ const routes = [
       { path: 'role-applications', component: AdminRoleApplications },
       { path: 'errands', component: AdminErrands },
       { path: 'complaints', component: AdminComplaints },
+      { path: 'refunds', component: AdminRefunds },
     ]
   }
 ]

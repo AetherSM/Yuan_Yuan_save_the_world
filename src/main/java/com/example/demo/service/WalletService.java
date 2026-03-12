@@ -23,4 +23,13 @@ public interface WalletService {
      * @return 交易记录列表
      */
     List<WalletTransaction> list(Long userId);
+
+    /**
+     * 退款入账：将金额退回用户余额并记录流水
+     * @param userId 用户ID
+     * @param amount 退款金额
+     * @param relatedOrderNo 关联订单号
+     * @param description 描述
+     */
+    void refundToUser(Long userId, java.math.BigDecimal amount, String relatedOrderNo, String description);
 }

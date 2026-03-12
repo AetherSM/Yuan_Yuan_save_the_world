@@ -56,6 +56,10 @@
         select * from errand_orders where order_no = #{orderNo}
     </select>
 
+    <select id="findById" resultMap="BaseResultMap">
+        select * from errand_orders where order_id = #{orderId}
+    </select>
+
     <select id="listByStatus" resultMap="BaseResultMap">
         select * from errand_orders where order_status = #{status} order by create_time desc
     </select>

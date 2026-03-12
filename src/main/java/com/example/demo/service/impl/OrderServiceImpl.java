@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<ProductOrder> listUserOrders(Long userId, Integer status) {
-        return productOrderMapper.listByUser(userId, status);
+        return productOrderMapper.listByUserWithItemSummary(userId, status);
     }
 
     @Override

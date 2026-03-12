@@ -49,5 +49,30 @@ public class WalletServiceImpl implements WalletService {
     public List<WalletTransaction> list(Long userId) {
         return walletTransactionMapper.listByUser(userId);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void refundToUser(Long userId, BigDecimal amount, String relatedOrderNo, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("退款金额必须大于0");
+        }
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        BigDecimal before = user.getBalance() == null ? BigDecimal.ZERO : user.getBalance();
+        BigDecimal after = before.add(amount);
+        userMapper.updateBalance(userId, after);
+
+        WalletTransaction tx = new WalletTransaction();
+        tx.setUserId(userId);
+        tx.setTransactionType(5); // 5-退款
+        tx.setAmount(amount);
+        tx.setBalanceBefore(before);
+        tx.setBalanceAfter(after);
+        tx.setRelatedOrderNo(relatedOrderNo);
+        tx.setDescription(description != null ? description : "订单退款");
+        walletTransactionMapper.insert(tx);
+    }
 }
 
