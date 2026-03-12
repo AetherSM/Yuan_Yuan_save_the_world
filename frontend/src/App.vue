@@ -21,6 +21,8 @@ const tabs = computed(() => {
     return [
       { path: '/merchant/products', label: '商品管理' },
       { path: '/merchant/orders', label: '订单管理' },
+      { path: '/merchant/reviews', label: '评价管理' },
+      { path: '/merchant/coupons', label: '优惠券' },
       { path: '/my', label: '我的' }
     ]
   }
