@@ -63,7 +63,6 @@ onMounted(load)
       </div>
       <div class="toolbar-right">
         <el-select v-model="status" placeholder="状态筛选" style="width:150px" clearable>
-          <el-option :value="null" label="全部状态" />
           <el-option v-for="(label, key) in statusMap" :key="key" :value="Number(key)" :label="label" />
         </el-select>
         <el-button type="info" plain @click="load" :loading="loading">刷新</el-button>

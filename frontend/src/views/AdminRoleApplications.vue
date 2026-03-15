@@ -3,12 +3,10 @@
     <h1>角色申请管理</h1>
     <div class="filters">
       <el-input v-model="filters.userId" placeholder="用户ID" style="width: 140px" />
-      <el-select v-model="filters.targetType" placeholder="目标角色" style="width: 160px">
-        <el-option :value="null" label="全部角色" />
+      <el-select v-model="filters.targetType" placeholder="目标角色" style="width: 160px" clearable>
         <el-option v-for="(label, key) in roleMap" :key="key" :label="label" :value="Number(key)" />
       </el-select>
-      <el-select v-model="filters.status" placeholder="状态" style="width: 140px">
-        <el-option :value="null" label="全部状态" />
+      <el-select v-model="filters.status" placeholder="状态" style="width: 140px" clearable>
         <el-option :value="0" label="待审核" />
         <el-option :value="1" label="已通过" />
         <el-option :value="2" label="已拒绝" />

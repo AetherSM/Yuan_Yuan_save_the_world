@@ -78,7 +78,6 @@ onMounted(load)
       <div class="toolbar-left">
         <el-input v-model="filters.keyword" placeholder="搜索商品名称" style="width:220px" clearable />
         <el-select v-model="filters.status" placeholder="状态" style="width:140px" clearable>
-          <el-option :value="null" label="全部状态" />
           <el-option :value="1" label="上架中" />
           <el-option :value="0" label="已下架" />
         </el-select>

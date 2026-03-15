@@ -79,7 +79,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     /**
-     * 退款入账：将金额退回用户余额并记录一条“退款”流水
+     * 退款入账：将金额退回用户余额并记录一条"退款"流水
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -103,6 +103,34 @@ public class WalletServiceImpl implements WalletService {
         tx.setBalanceAfter(after);
         tx.setRelatedOrderNo(relatedOrderNo);
         tx.setDescription(description != null ? description : "订单退款");
+        walletTransactionMapper.insert(tx);
+    }
+
+    /**
+     * 订单收入：将订单金额转入商家余额并记录流水
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addIncome(Long userId, BigDecimal amount, String relatedOrderNo, String description) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("收入金额必须大于0");
+        }
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+        BigDecimal before = user.getBalance() == null ? BigDecimal.ZERO : user.getBalance();
+        BigDecimal after = before.add(amount);
+        userMapper.updateBalance(userId, after);
+
+        WalletTransaction tx = new WalletTransaction();
+        tx.setUserId(userId);
+        tx.setTransactionType(4); // 4-收入
+        tx.setAmount(amount);
+        tx.setBalanceBefore(before);
+        tx.setBalanceAfter(after);
+        tx.setRelatedOrderNo(relatedOrderNo);
+        tx.setDescription(description != null ? description : "订单收入");
         walletTransactionMapper.insert(tx);
     }
 }

@@ -8,8 +8,7 @@
           <el-input v-model="pFilters.orderNo" placeholder="订单号" style="width: 220px" />
           <el-input v-model="pFilters.userId" placeholder="用户ID" style="width: 140px" />
           <el-input v-model="pFilters.sellerId" placeholder="商家ID" style="width: 140px" />
-          <el-select v-model="pFilters.status" placeholder="状态" style="width: 160px">
-            <el-option label="全部状态" :value="null" />
+          <el-select v-model="pFilters.status" placeholder="状态" style="width: 160px" clearable>
             <el-option v-for="(label, key) in productStatusMap" :key="key" :label="label" :value="Number(key)" />
           </el-select>
           <el-button type="primary" @click="loadProductOrders">搜索</el-button>
@@ -59,8 +58,7 @@
         <div class="filters">
           <el-input v-model="eFilters.userId" placeholder="用户ID" style="width: 140px" />
           <el-input v-model="eFilters.runnerId" placeholder="跑腿员ID" style="width: 140px" />
-          <el-select v-model="eFilters.status" placeholder="状态" style="width: 160px">
-            <el-option label="全部" :value="null" />
+          <el-select v-model="eFilters.status" placeholder="状态" style="width: 160px" clearable>
             <el-option v-for="(label, key) in errandStatusMap" :key="key" :label="label" :value="Number(key)" />
           </el-select>
           <el-button type="primary" @click="loadErrandOrders">搜索</el-button>

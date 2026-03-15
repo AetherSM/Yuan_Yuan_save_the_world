@@ -4,8 +4,7 @@
     <div class="filters">
       <el-input v-model="filters.keyword" placeholder="商品名称" />
       <el-input v-model="filters.sellerId" placeholder="商家ID" />
-      <el-select v-model="filters.status" placeholder="状态">
-        <el-option label="全部状态" :value="null" />
+      <el-select v-model="filters.status" placeholder="状态" clearable>
         <el-option label="上架" :value="1" />
         <el-option label="下架" :value="0" />
         <el-option label="待审核" :value="2" />

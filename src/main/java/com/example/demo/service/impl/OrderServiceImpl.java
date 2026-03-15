@@ -195,6 +195,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void confirm(String orderNo, Long userId) {
         ProductOrder order = productOrderMapper.findByOrderNo(orderNo);
         if (order == null || !order.getUserId().equals(userId)) {
@@ -204,6 +205,9 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalArgumentException("仅待收货订单可确认");
         }
         productOrderMapper.markConfirm(orderNo);
+        
+        // 用户确认收货后，将订单金额转入商家钱包
+        walletService.addIncome(order.getSellerId(), order.getTotalAmount(), orderNo, "订单完成收入");
     }
 
     @Override

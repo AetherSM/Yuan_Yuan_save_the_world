@@ -4,15 +4,13 @@
     <div class="filters">
       <el-input v-model="filters.phone" placeholder="手机号" />
       <el-input v-model="filters.nickname" placeholder="昵称" />
-      <el-select v-model="filters.userType" placeholder="角色">
-        <el-option label="全部角色" :value="null" />
+      <el-select v-model="filters.userType" placeholder="角色" clearable>
         <el-option label="管理员" :value="0" />
         <el-option label="普通用户" :value="1" />
         <el-option label="跑腿员" :value="2" />
         <el-option label="商家" :value="3" />
       </el-select>
-      <el-select v-model="filters.status" placeholder="状态">
-        <el-option label="全部状态" :value="null" />
+      <el-select v-model="filters.status" placeholder="状态" clearable>
         <el-option label="正常" :value="1" />
         <el-option label="禁用" :value="0" />
       </el-select>

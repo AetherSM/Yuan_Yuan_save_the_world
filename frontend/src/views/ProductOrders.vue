@@ -107,7 +107,7 @@ const viewDetail = (orderNo) => {
     <div class="toolbar">
       <label>筛选：</label>
       <select v-model="status" @change="load">
-        <option :value="null">全部</option>
+        <option value="">全部</option>
         <option :value="1">待支付</option>
         <option :value="2">待发货</option>
         <option :value="3">待收货</option>

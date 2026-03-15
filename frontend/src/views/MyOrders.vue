@@ -116,7 +116,7 @@ const submitRefund = async () => {
     <div class="toolbar">
       <label>筛选：</label>
       <select v-model="status" @change="load">
-        <option :value="null">全部</option>
+        <option value="">全部</option>
         <option :value="1">进行中</option>
         <option :value="4">历史-已完成</option>
         <option :value="5">历史-已取消</option>

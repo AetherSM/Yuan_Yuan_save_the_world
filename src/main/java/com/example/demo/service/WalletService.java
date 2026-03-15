@@ -41,4 +41,13 @@ public interface WalletService {
      * @param description 描述
      */
     void refundToUser(Long userId, java.math.BigDecimal amount, String relatedOrderNo, String description);
+
+    /**
+     * 订单收入：将订单金额转入商家余额并记录流水
+     * @param userId 商家用户ID
+     * @param amount 收入金额
+     * @param relatedOrderNo 关联订单号
+     * @param description 描述
+     */
+    void addIncome(Long userId, java.math.BigDecimal amount, String relatedOrderNo, String description);
 }
