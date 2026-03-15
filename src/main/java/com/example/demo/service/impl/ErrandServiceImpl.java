@@ -51,14 +51,19 @@ public class ErrandServiceImpl implements ErrandService {
             throw new IllegalArgumentException("订单状态不允许完成");
         }
         
-        // 计算总金额（赏金 + 小费）
-        java.math.BigDecimal totalAmount = order.getReward().add(order.getTip() != null ? order.getTip() : java.math.BigDecimal.ZERO);
+        // 计算总金额（优先使用 totalAmount 字段，否则按赏金 + 小费计算）
+        java.math.BigDecimal totalAmount = order.getTotalAmount();
+        if (totalAmount == null) {
+            java.math.BigDecimal reward = order.getReward() != null ? order.getReward() : java.math.BigDecimal.ZERO;
+            java.math.BigDecimal tip = order.getTip() != null ? order.getTip() : java.math.BigDecimal.ZERO;
+            totalAmount = reward.add(tip);
+        }
         
         // 从用户余额中扣除金额并记录流水
         walletService.deductForPayment(order.getUserId(), totalAmount, orderNo, "跑腿订单支付");
         
-        // 给跑腿员增加余额并记录流水
-        walletService.refundToUser(order.getRunnerId(), totalAmount, orderNo, "跑腿订单收入");
+        // 给跑腿员增加余额并记录一条“收入”流水
+        walletService.addIncome(order.getRunnerId(), totalAmount, orderNo, "跑腿订单收入");
         
         // 更新订单状态为已完成
         int updated = errandOrderMapper.updateStatus(orderNo, 4, null);

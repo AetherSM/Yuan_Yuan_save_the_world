@@ -8,6 +8,8 @@ const items = ref([]) // { cartItem: {...}, product: {...} }
 const addresses = ref([])
 const addressId = ref(null)
 const checkoutVisible = ref(false)
+const creatingAddress = ref(false)
+const newAddress = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '' })
 const loading = ref(false)
 const error = ref('')
 
@@ -52,8 +54,35 @@ const openCheckout = async () => {
       addresses.value = data.data || []
       addressId.value = addresses.value[0]?.addressId || null
       checkoutVisible.value = true
+      creatingAddress.value = addresses.value.length === 0
     }
   } catch (e) {}
+}
+const saveNewAddress = async () => {
+  if (!newAddress.value.contactName || !newAddress.value.contactPhone || !newAddress.value.address) {
+    ElMessage.error('请填写收货人、电话和详细地址')
+    return
+  }
+  try {
+    const res = await http.post('/addresses', newAddress.value)
+    const data = res.data
+    if (data && data.code === 1) {
+      ElMessage.success('地址已保存')
+      const addrRes = await http.get('/addresses')
+      if (addrRes.data && addrRes.data.code === 1) {
+        addresses.value = addrRes.data.data || []
+        if (addresses.value.length) {
+          addressId.value = addresses.value[addresses.value.length - 1].addressId
+        }
+      }
+      newAddress.value = { contactName: '', contactPhone: '', address: '', building: '', room: '' }
+      creatingAddress.value = false
+    } else {
+      ElMessage.error(data?.msg || '保存地址失败')
+    }
+  } catch (e) {
+    ElMessage.error('保存地址失败')
+  }
 }
 const checkout = async () => {
   if (!addressId.value) { ElMessage.error('请选择地址'); return }
@@ -155,6 +184,25 @@ const total = () => items.value.reduce((sum, x) => {
           <input type="radio" :value="a.addressId" v-model="addressId" />
           <span>{{ a.contactName }}（{{ a.contactPhone }}）{{ a.address }} {{ a.building }} {{ a.room }}</span>
         </label>
+        <div v-if="addresses.length === 0" class="empty-tip">暂无收货地址，请先填写一个。</div>
+      </div>
+      <div class="new-addr">
+        <div class="new-addr-header">
+          <span>新增地址</span>
+          <el-button type="primary" link size="small" @click="creatingAddress = !creatingAddress">
+            {{ creatingAddress ? '收起' : '展开' }}
+          </el-button>
+        </div>
+        <div v-if="creatingAddress" class="new-addr-form">
+          <el-input v-model="newAddress.contactName" placeholder="收货人" />
+          <el-input v-model="newAddress.contactPhone" placeholder="联系电话" />
+          <el-input v-model="newAddress.address" placeholder="详细地址，如宿舍楼、校区等" />
+          <el-input v-model="newAddress.building" placeholder="楼栋(可选)" />
+          <el-input v-model="newAddress.room" placeholder="房间号(可选)" />
+          <div class="new-addr-actions">
+            <el-button type="primary" size="small" @click="saveNewAddress">保存并使用</el-button>
+          </div>
+        </div>
       </div>
       <template #footer>
         <div class="dialog-footer">
@@ -175,6 +223,11 @@ const total = () => items.value.reduce((sum, x) => {
 .stock{color:#9ca3af}
 .summary{display:flex;justify-content:flex-end;gap:12px;align-items:center;margin-top:16px;border-top:1px solid #f3f4f6;padding-top:10px}
 .sum{color:#ef4444;font-weight:800}
-.addr-list{display:flex;flex-direction:column;gap:8px}
+.addr-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
 .addr-item{display:flex;gap:8px;align-items:center}
+.empty-tip{font-size:13px;color:#9ca3af}
+.new-addr{margin-top:8px;border-top:1px dashed #e5e7eb;padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.new-addr-header{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#374151}
+.new-addr-form{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.new-addr-actions{display:flex;justify-content:flex-end;margin-top:4px}
 </style>

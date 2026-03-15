@@ -101,6 +101,8 @@ public class AddressServiceImpl implements AddressService {
         a.setAddress(dto.getAddress());
         a.setBuilding(dto.getBuilding());
         a.setRoom(dto.getRoom());
+        a.setLongitude(dto.getLongitude());
+        a.setLatitude(dto.getLatitude());
         a.setIsDefault(dto.getIsDefault());
         return a;
     }

@@ -67,7 +67,7 @@ const roleMap = {
 const currentType = ref(Number(localStorage.getItem('userType') || 1))
 const currentRoleText = ref(roleMap[currentType.value] || '普通用户')
 
-const targetType = ref(null)
+const targetType = ref(undefined)
 const reason = ref('')
 const submitting = ref(false)
 const list = ref([])

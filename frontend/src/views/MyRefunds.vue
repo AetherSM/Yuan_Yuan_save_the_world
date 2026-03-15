@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus'
 
 const list = ref([])
 const loading = ref(false)
-const statusFilter = ref(null)
+const statusFilter = ref(undefined)
 const statusMap = { 0: '待处理', 2: '已退款', 3: '已拒绝' }
 const orderTypeMap = { 1: '商品订单', 2: '跑腿订单' }
 

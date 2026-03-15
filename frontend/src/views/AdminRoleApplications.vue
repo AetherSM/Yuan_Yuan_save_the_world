@@ -72,7 +72,7 @@ const roleMap = {
 
 const filters = ref({
   userId: '',
-  targetType: null,
+  targetType: undefined,
   status: 0,
 })
 

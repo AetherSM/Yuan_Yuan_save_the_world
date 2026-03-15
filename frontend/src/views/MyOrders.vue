@@ -6,7 +6,7 @@ const orders = ref([])
 const loading = ref(false)
 const error = ref('')
 const userId = localStorage.getItem('userId')
-const status = ref(null) // null: 全部, 4: 已完成, 5: 已取消
+const status = ref('') // '': 全部, 4: 已完成, 5: 已取消
 const keyword = ref('')
 const displayed = computed(() => {
   const kw = (keyword.value || '').trim().toLowerCase()

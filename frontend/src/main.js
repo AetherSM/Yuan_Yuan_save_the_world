@@ -6,4 +6,13 @@ import router from './router/index.js'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-createApp(App).use(router).use(ElementPlus).mount('#app')
+const app = createApp(App)
+
+// 全局错误处理
+app.config.errorHandler = (err, vm, info) => {
+  console.error('Vue Error:', err)
+  console.error('Component:', vm)
+  console.error('Info:', info)
+}
+
+app.use(router).use(ElementPlus).mount('#app')

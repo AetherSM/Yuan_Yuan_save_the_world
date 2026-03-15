@@ -23,6 +23,10 @@ public class Address {
     private String building;
     @Schema(description = "门牌号")
     private String room;
+    @Schema(description = "经度")
+    private java.math.BigDecimal longitude;
+    @Schema(description = "纬度")
+    private java.math.BigDecimal latitude;
     @Schema(description = "是否默认地址：0-否，1-是")
     private Integer isDefault;
     @Schema(description = "创建时间")

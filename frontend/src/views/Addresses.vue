@@ -1,14 +1,84 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import http from '../services/http'
 import { ElMessage } from 'element-plus'
 const list = ref([])
 const loading = ref(false)
 const error = ref('')
-const form = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '' })
+const form = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null })
 const editingId = ref(null)
-const editForm = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '' })
+const editForm = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null })
 const editVisible = ref(false)
+const amapKey = import.meta.env.VITE_AMAP_KEY || 'YOUR_AMAP_KEY_HERE'
+const showMap = ref(false)
+const mapInited = ref(false)
+const mapInstance = ref(null)
+const mapMarker = ref(null)
+const geocoderRef = ref(null)
+
+const loadAmapScript = () => {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== 'undefined' && window.AMap) {
+      resolve(window.AMap)
+      return
+    }
+    if (!amapKey || amapKey === 'YOUR_AMAP_KEY_HERE') {
+      reject(new Error('未配置高德地图 Key'))
+      return
+    }
+    const existed = document.querySelector('script[data-amap-sdk]')
+    if (existed) {
+      existed.addEventListener('load', () => resolve(window.AMap))
+      existed.addEventListener('error', reject)
+      return
+    }
+    const script = document.createElement('script')
+    script.src = `https://webapi.amap.com/maps?v=2.0&key=${amapKey}&plugin=AMap.Geocoder,AMap.Geolocation`
+    script.async = true
+    script.defer = true
+    script.setAttribute('data-amap-sdk', 'true')
+    script.onload = () => resolve(window.AMap)
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+}
+
+const openMapPicker = async () => {
+  showMap.value = true
+  await nextTick()
+  if (mapInited.value) return
+  try {
+    const AMap = await loadAmapScript()
+    const container = document.getElementById('address-map-container')
+    if (!container) return
+    mapInstance.value = new AMap.Map('address-map-container', {
+      zoom: 16,
+      center: [109.0, 34.0]
+    })
+    geocoderRef.value = new AMap.Geocoder()
+    mapInstance.value.on('click', (e) => {
+      const lnglat = [e.lnglat.lng, e.lnglat.lat]
+      if (!mapMarker.value) {
+        mapMarker.value = new AMap.Marker({ position: lnglat, map: mapInstance.value })
+      } else {
+        mapMarker.value.setPosition(lnglat)
+      }
+      form.value.longitude = e.lnglat.lng
+      form.value.latitude = e.lnglat.lat
+      if (geocoderRef.value) {
+        geocoderRef.value.getAddress(lnglat, (status, result) => {
+          if (status === 'complete' && result.regeocode) {
+            form.value.address = result.regeocode.formattedAddress || ''
+          }
+        })
+      }
+    })
+    mapInited.value = true
+  } catch (e) {
+    ElMessage.error('加载地图失败，请检查高德 Key 或网络')
+  }
+}
+
 const load = async () => {
   loading.value = true
   error.value = ''
@@ -63,6 +133,36 @@ const create = async () => {
     ElMessage.error(error.value)
   }
 }
+const locate = () => {
+  if (!navigator.geolocation) {
+    ElMessage.error('当前浏览器不支持定位')
+    return
+  }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const { longitude, latitude } = pos.coords
+      if (!amapKey || amapKey === 'YOUR_AMAP_KEY_HERE') {
+        form.value.address = `${longitude.toFixed(6)},${latitude.toFixed(6)}`
+        ElMessage.info('已填入经纬度，请完善详细地址')
+        return
+      }
+      const resp = await fetch(`https://restapi.amap.com/v3/geocode/regeo?key=${amapKey}&location=${longitude},${latitude}&radius=1000&extensions=base`)
+      const data = await resp.json()
+      if (data.status === '1' && data.regeocode && data.regeocode.formatted_address) {
+        form.value.address = data.regeocode.formatted_address
+        form.value.longitude = longitude
+        form.value.latitude = latitude
+        ElMessage.success('已根据定位填入地址，请确认后保存')
+      } else {
+        ElMessage.error('定位解析失败，请手动填写地址')
+      }
+    } catch (e) {
+      ElMessage.error('获取定位失败，请检查网络或稍后重试')
+    }
+  }, () => {
+    ElMessage.error('无法获取定位，请检查浏览器权限设置')
+  })
+}
 const editItem = (a) => {
   editingId.value = a.addressId
   editForm.value = {
@@ -70,13 +170,15 @@ const editItem = (a) => {
     contactPhone: a.contactPhone || '',
     address: a.address || '',
     building: a.building || '',
-    room: a.room || ''
+    room: a.room || '',
+    longitude: a.longitude ?? null,
+    latitude: a.latitude ?? null
   }
   editVisible.value = true
 }
 const cancelEdit = () => {
   editingId.value = null
-  editForm.value = { contactName: '', contactPhone: '', address: '', building: '', room: '' }
+  editForm.value = { contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null }
   editVisible.value = false
 }
 const removeItem = async (id) => {
@@ -113,6 +215,8 @@ onMounted(load)
         <el-input v-model="form.room" placeholder="房间号(可选)" />
       </div>
       <div class="row-actions">
+        <button class="btn gray" @click="locate">一键定位</button>
+        <button class="btn gray" @click="openMapPicker">地图选点</button>
         <button class="btn" @click="create">保存</button>
       </div>
     </div>
@@ -147,6 +251,14 @@ onMounted(load)
       </div>
     </div>
     <div v-if="error" class="error">{{ error }}</div>
+    <el-dialog v-model="showMap" title="选择地址" width="720px">
+      <div id="address-map-container" class="map-container"></div>
+      <template #footer>
+        <div class="dialog-footer">
+          <button class="btn gray" @click="showMap = false">关闭</button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -164,4 +276,5 @@ onMounted(load)
 .ops{display:flex;gap:8px;align-items:center}
 .badge{background:#42b883;color:#fff;border-radius:999px;padding:4px 8px;font-size:12px}
 .error{padding:12px;color:#d33}
+.map-container{width:100%;height:420px;border-radius:12px;overflow:hidden}
 </style>

@@ -10,7 +10,7 @@ const loading = ref(false)
 const error = ref('')
 const filters = ref({
   keyword: '',
-  status: null,
+  status: undefined,
 })
 const sellerId = Number(localStorage.getItem('userId') || 0)
 

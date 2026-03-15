@@ -26,7 +26,19 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true
       },
+      '/role-applications': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
       '/refunds': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/admin': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/wallet': {
         target: 'http://localhost:8080',
         changeOrigin: true
       }

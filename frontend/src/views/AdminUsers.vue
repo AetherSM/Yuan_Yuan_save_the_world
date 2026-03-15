@@ -77,8 +77,8 @@ const users = ref([])
 const filters = ref({
   phone: '',
   nickname: '',
-  userType: null,
-  status: null,
+  userType: undefined,
+  status: undefined,
 })
 
 const userTypeMap = {

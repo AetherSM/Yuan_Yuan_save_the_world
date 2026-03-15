@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus'
 const list = ref([])
 const loading = ref(false)
 const error = ref('')
-const status = ref(null)
+const status = ref(undefined)
 
 const statusMap = {
   1: '待支付',

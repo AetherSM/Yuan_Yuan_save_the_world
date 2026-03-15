@@ -47,8 +47,8 @@ import { ElMessage } from 'element-plus'
 const products = ref([])
 const filters = ref({
   keyword: '',
-  sellerId: null,
-  status: null,
+  sellerId: '',
+  status: undefined,
 })
 
 const statusMap = {

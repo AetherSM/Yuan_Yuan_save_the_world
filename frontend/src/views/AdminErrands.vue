@@ -63,8 +63,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 const errands = ref([])
 const filters = ref({
-  userId: null,
-  runnerId: null,
+  userId: '',
+  runnerId: '',
   status: '',
 })
 

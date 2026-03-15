@@ -119,8 +119,8 @@ const activeTab = ref('product')
 const productOrders = ref([])
 const errandOrders = ref([])
 
-const pFilters = ref({ orderNo: '', userId: '', sellerId: '', status: null })
-const eFilters = ref({ userId: '', runnerId: '', status: null })
+const pFilters = ref({ orderNo: '', userId: '', sellerId: '', status: undefined })
+const eFilters = ref({ userId: '', runnerId: '', status: undefined })
 
 const productStatusMap = {
   1: '待支付',
