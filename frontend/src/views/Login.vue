@@ -15,12 +15,59 @@ const loginPassword = ref('')
 
 // 注册表单
 const regPhone = ref('')
+const regEmail = ref('')
+const regCode = ref('')
 const regPassword = ref('')
 const regPassword2 = ref('')
 const regNickname = ref('')
 
 const loading = ref(false)
+const codeLoading = ref(false)
+const codeCountdown = ref(0)
 const message = ref('')
+
+const startCountdown = () => {
+  if (codeCountdown.value > 0) return
+  codeCountdown.value = 60
+  const timer = setInterval(() => {
+    codeCountdown.value--
+    if (codeCountdown.value <= 0) {
+      clearInterval(timer)
+    }
+  }, 1000)
+}
+
+const sendCode = async () => {
+  if (codeCountdown.value > 0 || codeLoading.value) return
+  
+  if (!regEmail.value) {
+    message.value = '请输入邮箱'
+    return
+  }
+  // 邮箱格式验证
+  const emailReg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+  if (!emailReg.test(regEmail.value)) {
+    message.value = '邮箱格式不正确'
+    return
+  }
+
+  codeLoading.value = true
+  message.value = ''
+  try {
+    const { data } = await http.get('/auth/send-code', { params: { email: regEmail.value } })
+    if (data && data.code === 1) {
+      message.value = '验证码已发送，请注意查收'
+      startCountdown()
+    } else {
+      message.value = data?.msg || '发送验证码失败'
+    }
+  } catch (e) {
+    console.error('Send code error:', e)
+    message.value = e?.response?.data?.msg || '发送验证码失败，请检查网络或配置'
+  } finally {
+    codeLoading.value = false
+  }
+}
 
 const doLogin = async () => {
   loading.value = true
@@ -56,8 +103,8 @@ const doLogin = async () => {
 }
 
 const doRegister = async () => {
-  if (!regPhone.value || !regPassword.value || !regNickname.value) {
-    message.value = '手机号、密码、昵称不能为空'
+  if (!regPhone.value || !regEmail.value || !regCode.value || !regPassword.value || !regNickname.value) {
+    message.value = '手机号、邮箱、验证码、密码、昵称不能为空'
     return
   }
   if (regPassword.value !== regPassword2.value) {
@@ -69,6 +116,8 @@ const doRegister = async () => {
   try {
     const payload = {
       phone: regPhone.value,
+      email: regEmail.value,
+      code: regCode.value,
       password: regPassword.value,
       nickname: regNickname.value
     }
@@ -107,6 +156,7 @@ const fillTest = (phone, pwd) => {
       
       <div class="tabs">
         <button 
+          type="button"
           class="tab" 
           :class="{ active: activeTab === 'login' }" 
           @click="activeTab = 'login'"
@@ -114,6 +164,7 @@ const fillTest = (phone, pwd) => {
           登录
         </button>
         <button 
+          type="button"
           class="tab" 
           :class="{ active: activeTab === 'register' }" 
           @click="activeTab = 'register'"
@@ -160,8 +211,34 @@ const fillTest = (phone, pwd) => {
             v-model="regPhone" 
             placeholder="请输入手机号" 
             class="custom-input"
-            prefix-icon="el-icon-mobile"
           />
+        </div>
+        <div class="field">
+          <label class="field-label">邮箱</label>
+          <el-input 
+            v-model="regEmail" 
+            placeholder="请输入邮箱" 
+            class="custom-input"
+          />
+        </div>
+        <div class="field">
+          <label class="field-label">验证码</label>
+          <div class="code-field">
+            <el-input 
+              v-model="regCode" 
+              placeholder="6位验证码" 
+              class="custom-input code-input"
+            />
+            <el-button 
+              type="primary" 
+              class="code-btn" 
+              :loading="codeLoading" 
+              :disabled="codeCountdown > 0"
+              @click.stop.prevent="sendCode"
+            >
+              {{ codeCountdown > 0 ? `${codeCountdown}s` : '获取验证码' }}
+            </el-button>
+          </div>
         </div>
         <div class="field">
           <label class="field-label">昵称</label>
@@ -169,7 +246,6 @@ const fillTest = (phone, pwd) => {
             v-model="regNickname" 
             placeholder="请输入昵称" 
             class="custom-input"
-            prefix-icon="el-icon-user"
           />
         </div>
         <div class="field">
@@ -180,7 +256,6 @@ const fillTest = (phone, pwd) => {
             placeholder="请输入密码" 
             show-password 
             class="custom-input"
-            prefix-icon="el-icon-lock"
           />
         </div>
         <div class="field">
@@ -191,7 +266,6 @@ const fillTest = (phone, pwd) => {
             placeholder="请再次输入密码" 
             show-password 
             class="custom-input"
-            prefix-icon="el-icon-lock"
           />
         </div>
         <el-button 
@@ -240,8 +314,27 @@ const fillTest = (phone, pwd) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url('../assets/login-bg.png'); /* 用户放置的图片路径 */
+  background-size: cover;
+  background-position: center;
+  background-color: #f0f2f5; /* 默认浅灰色背景，避免图片未加载时全黑 */
   padding: 20px;
+}
+
+.code-field {
+  display: flex;
+  gap: 10px;
+}
+
+.code-input {
+  flex: 1;
+}
+
+.code-btn {
+  width: 120px;
+  border-radius: 10px !important;
+  background-color: #409eff !important;
+  border-color: #409eff !important;
 }
 
 .login-card {
@@ -270,7 +363,7 @@ const fillTest = (phone, pwd) => {
   font-weight: 700;
   color: #333;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #409eff, #3a8ee6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -322,9 +415,9 @@ const fillTest = (phone, pwd) => {
 }
 
 .tab.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #409eff, #3a8ee6);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .panel {
@@ -351,8 +444,8 @@ const fillTest = (phone, pwd) => {
 }
 
 .custom-input:focus {
-  border-color: #667eea !important;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+  border-color: #409eff !important;
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1) !important;
 }
 
 .login-btn {
@@ -362,14 +455,14 @@ const fillTest = (phone, pwd) => {
   font-size: 16px !important;
   font-weight: 600 !important;
   border-radius: 10px !important;
-  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  background: linear-gradient(135deg, #409eff, #3a8ee6) !important;
   border: none !important;
   transition: all 0.3s ease !important;
 }
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+  box-shadow: 0 8px 20px rgba(64, 158, 255, 0.4) !important;
 }
 
 .login-btn:active {

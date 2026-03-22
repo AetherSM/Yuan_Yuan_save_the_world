@@ -23,6 +23,22 @@ public class UserController {
     private UserService userService;
 
     /**
+     * 发送邮箱验证码
+     * @param email 邮箱地址
+     * @return 成功与否
+     */
+    @GetMapping("/send-code")
+    @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送注册/登录验证码")
+    public Result<String> sendCode(@RequestParam String email) {
+        try {
+            userService.sendVerificationCode(email);
+            return Result.success("验证码已发送，请查收");
+        } catch (Exception e) {
+            return Result.error("发送失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 注册用户接口
      * @param userDTO 用户注册信息
      * @return 注册成功的用户信息

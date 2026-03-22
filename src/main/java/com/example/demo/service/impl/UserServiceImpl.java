@@ -10,16 +10,17 @@ import com.example.demo.properties.JwtProperties;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.JwtUtil;
 import com.example.demo.utils.MD5Util;
+import com.example.demo.utils.MailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,6 +34,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private MailUtil mailUtil;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private static final String VERIFY_CODE_KEY_PREFIX = "user:verify_code:";
+    private static final long EXPIRE_DURATION = 5; // 5分钟有效
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserEntity register(UserDTO userDTO) {
@@ -40,12 +50,32 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.hasText(userDTO.getPhone())) {
             throw new IllegalArgumentException("手机号不能为空");
         }
+        if (!StringUtils.hasText(userDTO.getEmail())) {
+            throw new IllegalArgumentException("邮箱不能为空");
+        }
+        if (!StringUtils.hasText(userDTO.getCode())) {
+            throw new IllegalArgumentException("验证码不能为空");
+        }
         if (!StringUtils.hasText(userDTO.getPassword())) {
             throw new IllegalArgumentException("密码不能为空");
         }
         if (!StringUtils.hasText(userDTO.getNickname())) {
             throw new IllegalArgumentException("昵称不能为空");
         }
+
+        // 验证验证码 (使用 Redis)
+        String redisKey = VERIFY_CODE_KEY_PREFIX + userDTO.getEmail();
+        String storedCode = redisTemplate.opsForValue().get(redisKey);
+        
+        if (storedCode == null) {
+            throw new IllegalArgumentException("验证码已过期或未获取");
+        }
+        if (!storedCode.equals(userDTO.getCode())) {
+            throw new IllegalArgumentException("验证码错误");
+        }
+        
+        // 验证成功后删除验证码
+        redisTemplate.delete(redisKey);
         
         // 验证手机号格式（简单验证，11位数字）
         if (!userDTO.getPhone().matches("^1[3-9]\\d{9}$")) {
@@ -75,12 +105,6 @@ public class UserServiceImpl implements UserService {
             userDTO.setGender(0); // 默认未知（0-未知，1-男，2-女）
         }
         
-        // 验证gender值是否有效
-        Integer gender = userDTO.getGender();
-        if (gender < 0 || gender > 2) {
-            throw new IllegalArgumentException("性别参数不正确（0-未知，1-男，2-女）");
-        }
-
         // 5. 设置其他默认值
         LocalDateTime now = LocalDateTime.now();
         userDTO.setCreateTime(now);
@@ -158,6 +182,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userInfo = new UserEntity();
         userInfo.setUserId(user.getUserId());
         userInfo.setPhone(user.getPhone());
+        userInfo.setEmail(user.getEmail());
         userInfo.setNickname(user.getNickname());
         userInfo.setAvatar(user.getAvatar());
         userInfo.setGender(user.getGender());
@@ -217,5 +242,20 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("不能直接将用户设置为管理员，请通过角色申请审批");
         }
         userMapper.updateUserType(userId, userType);
+    }
+
+    @Override
+    public void sendVerificationCode(String email) {
+        // 1. 生成6位数字验证码
+        String code = String.format("%06d", new Random().nextInt(1000000));
+        
+        // 2. 存储验证码 (使用 Redis，有效期 5 分钟)
+        String redisKey = VERIFY_CODE_KEY_PREFIX + email;
+        redisTemplate.opsForValue().set(redisKey, code, EXPIRE_DURATION, TimeUnit.MINUTES);
+        
+        // 3. 发送邮件
+        String subject = "【校园购】注册验证码";
+        String content = "您的验证码为：" + code + "，有效期5分钟。请勿泄露给他人。";
+        mailUtil.sendTextMail(subject, content, Collections.singletonList(email));
     }
 }

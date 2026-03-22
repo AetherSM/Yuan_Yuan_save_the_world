@@ -19,7 +19,11 @@ http.interceptors.response.use(
     if (err?.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('userId')
-      window.location.href = '/login'
+      localStorage.removeItem('nickname')
+      localStorage.removeItem('userType')
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(err)
   }

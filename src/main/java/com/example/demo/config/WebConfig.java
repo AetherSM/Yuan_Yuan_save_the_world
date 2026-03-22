@@ -26,6 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/auth/login",     // 排除登录接口
                         "/auth/register",  // 排除注册接口
+                        "/auth/send-code", // 排除获取验证码接口
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 );

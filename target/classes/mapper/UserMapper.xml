@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.example.demo.pojo.entity.UserEntity">
         <id column="user_id" property="userId"/>
         <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
         <result column="password" property="password"/>
         <result column="nickname" property="nickname"/>
         <result column="avatar" property="avatar"/>
@@ -24,11 +25,12 @@
     <!-- 注册用户 -->
     <insert id="register" useGeneratedKeys="true" keyProperty="userId" keyColumn="user_id">
         insert into users(
-            phone, password, nickname, avatar, gender, student_id, school, dormitory,
+            phone, email, password, nickname, avatar, gender, student_id, school, dormitory,
             user_type, status, create_time, update_time
         )
         values(
             #{phone},
+            #{email},
             #{password},
             #{nickname},
             #{avatar},
@@ -45,21 +47,21 @@
     
     <!-- 根据手机号查询用户 -->
     <select id="findByPhone" resultMap="BaseResultMap">
-        select user_id, phone, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
+        select user_id, phone, email, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
         from users
         where phone = #{phone}
     </select>
     
     <!-- 根据用户ID查询用户 -->
     <select id="findById" resultMap="BaseResultMap">
-        select user_id, phone, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
+        select user_id, phone, email, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
         from users
         where user_id = #{userId}
     </select>
     
     <!-- 查询所有用户列表 -->
     <select id="findAllUsers" resultMap="BaseResultMap">
-        select user_id, phone, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
+        select user_id, phone, email, password, nickname, avatar, gender, student_id, school, dormitory, balance, credit_score, user_type, status, create_time, update_time
         from users
         order by create_time desc
     </select>

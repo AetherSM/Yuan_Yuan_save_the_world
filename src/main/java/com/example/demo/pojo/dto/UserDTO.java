@@ -16,6 +16,12 @@ public class UserDTO {
     @Schema(description = "手机号")
     private String phone; // 必传
 
+    @Schema(description = "邮箱")
+    private String email; // 必传（用于验证码）
+
+    @Schema(description = "验证码")
+    private String code; // 注册时必传
+
     @Schema(description = "密码")
     private String password; // 必传
 
