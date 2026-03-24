@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import http from '../services/http'
 import { ElMessage } from 'element-plus'
+import NoticeBar from '../components/NoticeBar.vue'
 const list = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -39,6 +40,7 @@ const addToCart = async (id) => {
 
 <template>
   <div class="page">
+    <NoticeBar />
     <div class="page-card jd-header">
       <div class="logo">校园购</div>
       <div class="search">

@@ -18,6 +18,7 @@ import ShoppingRecords from '../views/ShoppingRecords.vue'
 import OrderDetail from '../views/OrderDetail.vue'
 import AdminLayout from '../views/AdminLayout.vue'
 import AdminUsers from '../views/AdminUsers.vue'
+import AdminNotices from '../views/AdminNotices.vue'
 import AdminProducts from '../views/AdminProducts.vue'
 import AdminErrands from '../views/AdminErrands.vue'
 import AdminComplaints from '../views/AdminComplaints.vue'
@@ -57,6 +58,7 @@ const routes = [
     children: [
       { path: '', component: AdminDashboard },
       { path: 'users', component: AdminUsers },
+      { path: 'notices', component: AdminNotices },
       { path: 'products', component: AdminProducts },
       { path: 'orders', component: AdminOrders },
       { path: 'role-applications', component: AdminRoleApplications },

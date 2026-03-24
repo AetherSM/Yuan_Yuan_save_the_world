@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import http from '../services/http'
 import { ElMessage } from 'element-plus'
+import NoticeBar from '../components/NoticeBar.vue'
 
 const list = ref([])
 const loading = ref(false)
@@ -71,6 +72,7 @@ onMounted(load)
 
 <template>
   <div class="page">
+    <NoticeBar />
     <div class="page-card toolbar">
       <div class="toolbar-left">
         <div class="title">我的跑腿任务</div>

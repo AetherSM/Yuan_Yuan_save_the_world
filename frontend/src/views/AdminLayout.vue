@@ -4,6 +4,7 @@
       <div class="logo">管理后台</div>
       <nav class="menu">
         <router-link to="/admin" class="menu-item">概览</router-link>
+        <router-link to="/admin/notices" class="menu-item">公告管理</router-link>
         <router-link to="/admin/users" class="menu-item">用户管理</router-link>
         <router-link to="/admin/products" class="menu-item">商品管理</router-link>
         <router-link to="/admin/orders" class="menu-item">订单管理</router-link>
@@ -42,6 +43,7 @@ const nickname = computed(() => localStorage.getItem('nickname') || '')
 
 const pageTitle = computed(() => {
   const p = route.path || ''
+  if (p.startsWith('/admin/notices')) return '公告管理'
   if (p.startsWith('/admin/users')) return '用户管理'
   if (p.startsWith('/admin/products')) return '商品管理'
   if (p.startsWith('/admin/orders')) return '订单管理'

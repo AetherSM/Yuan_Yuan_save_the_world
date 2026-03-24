@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.NoticeMapper">
+    <resultMap id="NoticeResultMap" type="com.example.demo.pojo.entity.NoticeEntity">
+        <id column="notice_id" property="noticeId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="visibility" property="visibility"/>
+        <result column="target_types" property="targetTypes"/>
+        <result column="target_users" property="targetUsers"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="NoticeResultMap">
+        select * from notices order by create_time desc
+    </select>
+
+    <select id="findVisibleNotices" resultMap="NoticeResultMap">
+        select * from notices
+        where visibility = 0
+        or (visibility = 1 and find_in_set(#{userType}, target_types))
+        or (visibility = 2 and json_contains(target_users, CAST(#{userId} AS CHAR)))
+        order by create_time desc
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="noticeId">
+        insert into notices(title, content, visibility, target_types, target_users, admin_id)
+        values(#{title}, #{content}, #{visibility}, #{targetTypes}, #{targetUsers}, #{adminId})
+    </insert>
+
+    <update id="update">
+        update notices
+        set title = #{title},
+            content = #{content},
+            visibility = #{visibility},
+            target_types = #{targetTypes},
+            target_users = #{targetUsers},
+            update_time = now()
+        where notice_id = #{noticeId}
+    </update>
+
+    <delete id="deleteById">
+        delete from notices where notice_id = #{noticeId}
+    </delete>
+</mapper>

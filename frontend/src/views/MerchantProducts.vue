@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import http from '../services/http'
 import { ElMessage } from 'element-plus'
+import NoticeBar from '../components/NoticeBar.vue'
 
 const router = useRouter()
 const list = ref([])
@@ -63,6 +64,7 @@ onMounted(load)
 
 <template>
   <div class="page">
+    <NoticeBar />
     <div class="page-card toolbar">
       <div class="toolbar-left">
         <div class="title">商品管理</div>
