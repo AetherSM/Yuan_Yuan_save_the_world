@@ -10,16 +10,24 @@ const editingId = ref(null)
 const editForm = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null })
 const editVisible = ref(false)
 const amapKey = import.meta.env.VITE_AMAP_KEY || 'YOUR_AMAP_KEY_HERE'
+const amapSecurityJsCode = import.meta.env.VITE_AMAP_SECURITY_JS_CODE || ''
 const showMap = ref(false)
 const mapInited = ref(false)
 const mapInstance = ref(null)
 const mapMarker = ref(null)
 const geocoderRef = ref(null)
 
+const ensureAmapSecurity = () => {
+  if (typeof window !== 'undefined' && amapSecurityJsCode) {
+    window['_AMapSecurityConfig'] = { securityJsCode: amapSecurityJsCode }
+  }
+}
+
 const loadAmapScript = () => {
   return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined' && window.AMap) {
-      resolve(window.AMap)
+    ensureAmapSecurity()
+    if (typeof window !== 'undefined' && window['AMap']) {
+      resolve(window['AMap'])
       return
     }
     if (!amapKey || amapKey === 'YOUR_AMAP_KEY_HERE') {
@@ -28,7 +36,7 @@ const loadAmapScript = () => {
     }
     const existed = document.querySelector('script[data-amap-sdk]')
     if (existed) {
-      existed.addEventListener('load', () => resolve(window.AMap))
+      existed.addEventListener('load', () => resolve(window['AMap']))
       existed.addEventListener('error', reject)
       return
     }
@@ -37,9 +45,20 @@ const loadAmapScript = () => {
     script.async = true
     script.defer = true
     script.setAttribute('data-amap-sdk', 'true')
-    script.onload = () => resolve(window.AMap)
+    script.onload = () => resolve(window['AMap'])
     script.onerror = reject
     document.head.appendChild(script)
+  })
+}
+const reverseGeocodeBySdk = async (longitude, latitude) => {
+  const AMap = await loadAmapScript()
+  return new Promise((resolve, reject) => {
+    const geocoder = new AMap.Geocoder()
+    geocoder.getAddress([longitude, latitude], (status, result) => {
+      const formatted = result?.regeocode?.formattedAddress || result?.regeocode?.formatted_address || ''
+      if (status === 'complete' && formatted) resolve(formatted)
+      else reject(new Error('逆地理解析失败'))
+    })
   })
 }
 
@@ -141,23 +160,12 @@ const locate = () => {
   navigator.geolocation.getCurrentPosition(async (pos) => {
     try {
       const { longitude, latitude } = pos.coords
-      if (!amapKey || amapKey === 'YOUR_AMAP_KEY_HERE') {
-        form.value.address = `${longitude.toFixed(6)},${latitude.toFixed(6)}`
-        ElMessage.info('已填入经纬度，请完善详细地址')
-        return
-      }
-      const resp = await fetch(`https://restapi.amap.com/v3/geocode/regeo?key=${amapKey}&location=${longitude},${latitude}&radius=1000&extensions=base`)
-      const data = await resp.json()
-      if (data.status === '1' && data.regeocode && data.regeocode.formatted_address) {
-        form.value.address = data.regeocode.formatted_address
-        form.value.longitude = longitude
-        form.value.latitude = latitude
-        ElMessage.success('已根据定位填入地址，请确认后保存')
-      } else {
-        ElMessage.error('定位解析失败，请手动填写地址')
-      }
+      form.value.address = await reverseGeocodeBySdk(longitude, latitude)
+      form.value.longitude = longitude
+      form.value.latitude = latitude
+      ElMessage.success('已根据定位填入地址，请确认后保存')
     } catch (e) {
-      ElMessage.error('获取定位失败，请检查网络或稍后重试')
+      ElMessage.error('定位成功但地址解析失败，请改用地图选点')
     }
   }, () => {
     ElMessage.error('无法获取定位，请检查浏览器权限设置')
