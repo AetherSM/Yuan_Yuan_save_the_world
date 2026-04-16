@@ -67,6 +67,16 @@ const saveDraft = () => {
   try { localStorage.setItem(draftKey, JSON.stringify(d)) } catch (e) {}
 }
 watch([title, description, pickupAddress, deliveryAddress, contactName, contactPhone, reward, errandType, selectedAddressId, pickupLongitude, pickupLatitude, deliveryLongitude, deliveryLatitude, estimatedDistance], saveDraft)
+const parseLngLatText = (text) => {
+  if (!text) return null
+  const match = String(text).trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/)
+  if (!match) return null
+  const longitude = Number(match[1])
+  const latitude = Number(match[2])
+  if (Number.isNaN(longitude) || Number.isNaN(latitude)) return null
+  if (longitude < -180 || longitude > 180 || latitude < -90 || latitude > 90) return null
+  return { longitude, latitude }
+}
 const formatAddress = (item) => [item.address, item.building, item.room].filter(Boolean).join(' ')
 const loadAddresses = async () => {
   try {
@@ -144,6 +154,21 @@ const reverseGeocodeBySdk = async (longitude, latitude) => {
     })
   })
 }
+const normalizePickupAddress = async (silent = false) => {
+  const parsed = parseLngLatText(pickupAddress.value)
+  if (!parsed) return true
+  pickupLongitude.value = parsed.longitude
+  pickupLatitude.value = parsed.latitude
+  try {
+    pickupAddress.value = await reverseGeocodeBySdk(parsed.longitude, parsed.latitude)
+    if (!silent) ElMessage.success('已自动将坐标转换为标准地址')
+    return true
+  } catch (e) {
+    pickupAddress.value = ''
+    if (!silent) ElMessage.error('坐标无法解析为地址，请使用地图选点')
+    return false
+  }
+}
 const geocodeAddressBySdk = async (address) => {
   const AMap = await loadAmapScript()
   return new Promise((resolve, reject) => {
@@ -220,6 +245,8 @@ const estimateReward = async () => {
   if (!ensureAmapKey()) return
   estimating.value = true
   try {
+    const pickupOk = await normalizePickupAddress()
+    if (!pickupOk) return
     const pickupPoint = (pickupLongitude.value != null && pickupLatitude.value != null)
       ? { longitude: Number(pickupLongitude.value), latitude: Number(pickupLatitude.value) }
       : await geocodeAddressBySdk(pickupAddress.value)
@@ -265,6 +292,11 @@ const submit = async () => {
   loading.value = true
   message.value = ''
   try {
+    const pickupOk = await normalizePickupAddress()
+    if (!pickupOk) {
+      message.value = '请填写可解析的取件地址'
+      return
+    }
     if (!title.value || !pickupAddress.value || !deliveryAddress.value || !contactName.value || !contactPhone.value) {
       message.value = '请完整填写信息'
       return
@@ -310,6 +342,9 @@ const submit = async () => {
   }
 }
 onMounted(loadAddresses)
+onMounted(() => {
+  normalizePickupAddress(true)
+})
 </script>
 
 <template>
@@ -326,11 +361,7 @@ onMounted(loadAddresses)
     </div>
     <div class="row">
       <label>取件地址</label>
-      <div class="inline-row">
-        <el-input v-model="pickupAddress" placeholder="请输入取件地址" />
-        <button class="btn gray mini" type="button" @click="locatePickup">定位</button>
-        <button class="btn gray mini" type="button" @click="openPickupMap">地图选点</button>
-      </div>
+      <el-input v-model="pickupAddress" placeholder="请输入取件地址（仅支持手动填写）" />
     </div>
     <div class="row">
       <label>送达地址</label>
@@ -373,10 +404,6 @@ onMounted(loadAddresses)
     </div>
     <button class="btn" :disabled="loading" @click="submit">发布</button>
     <div class="msg" v-if="message">{{ message }}</div>
-    <el-dialog v-model="showPickupMap" title="选择取件地址" width="720px">
-      <div id="pickup-map-container" class="map-container"></div>
-      <div class="sub-tip">点击地图位置后自动回填标准地址，不再显示纯坐标。</div>
-    </el-dialog>
   </div>
 </template>
 
