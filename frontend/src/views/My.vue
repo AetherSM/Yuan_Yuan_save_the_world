@@ -11,6 +11,7 @@ import Wallet from './Wallet.vue'
 import MerchantRefunds from './MerchantRefunds.vue'
 import RunnerRefunds from './RunnerRefunds.vue'
 import RoleApply from './RoleApply.vue'
+import MyComplaints from './MyComplaints.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,6 +84,7 @@ const syncFromQuery = () => {
       : t === 'errands' ? 'errands'
       : t === 'records' ? 'records'
       : t === 'addresses' ? 'addresses'
+      : t === 'complaints' ? 'complaints'
       : t === 'roles' ? 'roles'
       : t === 'refunds' ? 'refunds'
       : 'orders'
@@ -155,20 +157,21 @@ const logout = async () => {
         <button class="tab" :class="{active: activeTab==='errands'}" @click="switchTab('errands')">跑腿订单</button>
         <button class="tab" :class="{active: activeTab==='records'}" @click="switchTab('records')">购物记录</button>
         <button class="tab" :class="{active: activeTab==='addresses'}" @click="switchTab('addresses')">地址管理</button>
+        <button class="tab" :class="{active: activeTab==='complaints'}" @click="switchTab('complaints')">我的投诉</button>
         <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">钱包充值</button>
         <button class="tab" :class="{active: activeTab==='roles'}" @click="switchTab('roles')">角色申请</button>
       </template>
       
       <!-- 商家功能 -->
       <template v-if="isMerchant">
-        <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">钱包/收入</button>
+        <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">金额流水</button>
         <button class="tab" :class="{active: activeTab==='refunds'}" @click="switchTab('refunds')">退款管理</button>
         <button class="tab" :class="{active: activeTab==='roles'}" @click="switchTab('roles')">角色申请</button>
       </template>
       
       <!-- 跑腿员功能 -->
       <template v-if="isRunner">
-        <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">钱包/收入</button>
+        <button class="tab" :class="{active: activeTab==='wallet'}" @click="switchTab('wallet')">金额流水</button>
         <button class="tab" :class="{active: activeTab==='refunds'}" @click="switchTab('refunds')">退款处理</button>
         <button class="tab" :class="{active: activeTab==='roles'}" @click="switchTab('roles')">角色申请</button>
       </template>
@@ -182,6 +185,7 @@ const logout = async () => {
       <MyOrders v-else-if="activeTab==='errands' && !isMerchant && !isRunner" />
       <ShoppingRecords v-else-if="activeTab==='records' && !isMerchant && !isRunner" />
       <Addresses v-else-if="activeTab==='addresses' && !isMerchant && !isRunner" />
+      <MyComplaints v-else-if="activeTab==='complaints' && !isMerchant && !isRunner" />
       <Wallet v-else-if="activeTab==='wallet'" />
       <MerchantRefunds v-else-if="activeTab==='refunds' && isMerchant" />
       <RunnerRefunds v-else-if="activeTab==='refunds' && isRunner" />

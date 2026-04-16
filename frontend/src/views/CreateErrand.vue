@@ -301,6 +301,10 @@ const submit = async () => {
       message.value = '请完整填写信息'
       return
     }
+    if (Number(reward.value) <= 0) {
+      message.value = '赏金必须大于0'
+      return
+    }
     const body = {
       title: title.value,
       description: description.value,
@@ -395,7 +399,7 @@ onMounted(() => {
     <div class="row">
       <label>赏金</label>
       <div class="reward-row">
-        <el-input-number v-model="reward" :min="0" :step="1" />
+        <el-input-number v-model="reward" :min="1" :step="1" />
         <button class="btn gray mini" type="button" :disabled="estimating" @click="estimateReward">
           {{ estimating ? '估价中...' : '智能估价' }}
         </button>

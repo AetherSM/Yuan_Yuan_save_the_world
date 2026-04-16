@@ -7,6 +7,9 @@ import com.example.demo.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,8 +29,13 @@ public class ErrandServiceImpl implements ErrandService {
 
     @Override
     public void createOrder(ErrandOrder order) {
+        validateCreateOrder(order);
         order.setOrderNo("EO" + LocalDateTime.now().format(ORDER_NO_FMT) + (1000 + RANDOM.nextInt(9000)));
         order.setOrderStatus(0); // 待审核
+        if (order.getTip() == null) {
+            order.setTip(BigDecimal.ZERO);
+        }
+        order.setTotalAmount(order.getReward().add(order.getTip()));
         errandOrderMapper.insert(order);
     }
 
@@ -95,5 +103,29 @@ public class ErrandServiceImpl implements ErrandService {
     @Override
     public void updateErrandStatusByAdmin(Long orderId, Integer status) {
         errandOrderMapper.updateStatusById(orderId, status);
+    }
+
+    private void validateCreateOrder(ErrandOrder order) {
+        if (order == null) {
+            throw new IllegalArgumentException("订单信息不能为空");
+        }
+        if (!StringUtils.hasText(order.getTitle())) {
+            throw new IllegalArgumentException("标题不能为空");
+        }
+        if (!StringUtils.hasText(order.getPickupAddress())) {
+            throw new IllegalArgumentException("取件地址不能为空");
+        }
+        if (!StringUtils.hasText(order.getDeliveryAddress())) {
+            throw new IllegalArgumentException("送达地址不能为空");
+        }
+        if (!StringUtils.hasText(order.getContactName())) {
+            throw new IllegalArgumentException("联系人不能为空");
+        }
+        if (!StringUtils.hasText(order.getContactPhone())) {
+            throw new IllegalArgumentException("联系电话不能为空");
+        }
+        if (order.getReward() == null || order.getReward().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("赏金必须大于0");
+        }
     }
 }

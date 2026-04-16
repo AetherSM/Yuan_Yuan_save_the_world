@@ -1,0 +1,102 @@
+{
+  "env": {
+    "baseUrl": "http://localhost:8080",
+    "token": "替换为普通用户token",
+    "sellerToken": "替换为商家token",
+    "runnerToken": "替换为跑腿员token",
+    "adminToken": "替换为管理员token",
+    "userId": 1,
+    "runnerId": 2,
+    "productId": 1,
+    "addressId": 1,
+    "orderNo": "PO202601010000001234",
+    "errandOrderNo": "EO202601010000001234",
+    "refundId": 1,
+    "reviewId": 1,
+    "complaintId": 1,
+    "couponId": 1,
+    "wantedId": 1,
+    "targetUserId": 2,
+    "errandOrderId": 1
+  },
+  "samples": {
+    "auth": {
+      "login": {
+        "phone": "13800000001",
+        "password": "123456"
+      },
+      "register": {
+        "phone": "13800000099",
+        "email": "u99@example.com",
+        "password": "123456",
+        "nickname": "用户99",
+        "code": "000000"
+      }
+    },
+    "wallet": {
+      "recharge": { "amount": 100 }
+    },
+    "address": {
+      "create": {
+        "contactName": "张三",
+        "contactPhone": "13800000000",
+        "address": "陕西省西安市雁塔区某某小区某号楼",
+        "building": "2号楼",
+        "room": "301",
+        "longitude": 108.948024,
+        "latitude": 34.263161,
+        "isDefault": 1
+      }
+    },
+    "order": {
+      "create": {
+        "addressId": 1,
+        "items": [{ "productId": 1, "quantity": 1 }],
+        "remark": "请尽快发货"
+      },
+      "cancel": { "cancelReason": "不想要了" }
+    },
+    "refund": {
+      "applyProduct": {
+        "orderType": 1,
+        "orderNo": "PO202601010000001234",
+        "refundAmount": 1,
+        "reason": "不想要了"
+      },
+      "handle": { "handleRemark": "" }
+    },
+    "roleApplication": {
+      "apply": { "targetType": "2", "reason": "想当跑腿员" }
+    },
+    "errand": {
+      "create": {
+        "title": "取快递",
+        "description": "帮我去菜鸟驿站取一下快递",
+        "pickupAddress": "菜鸟驿站(XX校区)",
+        "deliveryAddress": "XX校区 2号宿舍楼 301",
+        "contactName": "张三",
+        "contactPhone": "13800000000",
+        "reward": 5,
+        "errandType": 1,
+        "tip": 0
+      }
+    },
+    "wanted": {
+      "create": { "title": "求购二手书", "price": 10, "description": "Java入门书籍" },
+      "status": { "postId": 1, "status": 2 }
+    },
+    "complaint": {
+      "submit": { "orderType": 1, "orderNo": "PO202601010000001234", "content": "商家服务差" }
+    },
+    "coupon": {
+      "receive": { "userId": 1, "couponId": 1 }
+    },
+    "review": {
+      "create": { "rating": 5, "content": "很好", "orderType": 1, "isAnonymous": 0 }
+    },
+    "reviewReply": {
+      "create": { "content": "谢谢支持" }
+    }
+  }
+}
+

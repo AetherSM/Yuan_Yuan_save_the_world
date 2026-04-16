@@ -26,6 +26,41 @@ const displayedList = computed(() => {
     return s.includes(kw)
   })
 })
+
+const complaintDialog = ref(false)
+const complaintForm = ref({ orderId: null, orderType: 1, reason: '' })
+const complaintSubmitting = ref(false)
+
+const openComplaint = (o) => {
+  complaintForm.value = { orderId: o.orderId, orderType: 1, reason: '' }
+  complaintDialog.value = true
+}
+
+const submitComplaint = async () => {
+  if (!complaintForm.value.reason.trim()) {
+    ElMessage.warning('请填写投诉原因')
+    return
+  }
+  complaintSubmitting.value = true
+  try {
+    const userId = localStorage.getItem('userId')
+    const { data } = await http.post('/api/complaints/submit', {
+      ...complaintForm.value,
+      complainantId: userId
+    })
+    if (data && data.code === 1) {
+      ElMessage.success('投诉已提交')
+      complaintDialog.value = false
+    } else {
+      ElMessage.error(data?.msg || '提交失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  } finally {
+    complaintSubmitting.value = false
+  }
+}
+
 const load = async () => {
   loading.value = true
   error.value = ''
@@ -132,8 +167,20 @@ const viewDetail = (orderNo) => {
         <button v-if="o.orderStatus===1" class="btn gray" @click="cancel(o.orderNo)">取消订单</button>
         <button v-if="o.orderStatus===3" class="btn" @click="confirm(o.orderNo)">确认收货</button>
         <button v-if="canRefund(o)" class="btn warn" @click="openRefund(o)">申请退款</button>
+        <button class="btn danger" @click="openComplaint(o)">投诉</button>
       </div>
     </div>
+    <el-dialog v-model="complaintDialog" title="发起投诉" width="400">
+      <div class="complaint-form">
+        <p>订单号：{{ displayedList.find(it => it.orderId === complaintForm.orderId)?.orderNo }}</p>
+        <p>投诉原因：</p>
+        <el-input v-model="complaintForm.reason" type="textarea" rows="4" placeholder="请详细描述您遇到的问题" />
+      </div>
+      <template #footer>
+        <el-button @click="complaintDialog = false">取消</el-button>
+        <el-button type="danger" @click="submitComplaint" :loading="complaintSubmitting">提交投诉</el-button>
+      </template>
+    </el-dialog>
     <el-dialog v-model="refundDialog" title="申请退款" width="400">
       <div class="refund-form">
         <p>订单号：{{ refundForm.orderNo }}</p>
@@ -163,6 +210,7 @@ const viewDetail = (orderNo) => {
 .btn{padding:8px 12px;border:none;border-radius:10px;background:#42b883;color:#fff;cursor:pointer}
 .btn.gray{background:#e5e7eb;color:#111827}
 .btn.warn{background:#f59e0b;color:#fff}
+.btn.danger{background:#ef4444;color:#fff}
 .ops{display:flex;gap:8px;margin-top:8px}
 .refund-form p{margin:10px 0}
 .empty{padding:24px;text-align:center;color:#999}

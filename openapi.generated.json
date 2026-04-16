@@ -1,0 +1,4291 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "demo API (generated from code)",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "tags": [
+    {
+      "name": "二手求购管理"
+    },
+    {
+      "name": "优惠券管理"
+    },
+    {
+      "name": "分类管理"
+    },
+    {
+      "name": "商品管理"
+    },
+    {
+      "name": "商品订单"
+    },
+    {
+      "name": "地址管理"
+    },
+    {
+      "name": "投诉管理"
+    },
+    {
+      "name": "用户认证"
+    },
+    {
+      "name": "管理员-商品管理"
+    },
+    {
+      "name": "管理员-投诉管理"
+    },
+    {
+      "name": "管理员-用户管理"
+    },
+    {
+      "name": "管理员-角色申请管理"
+    },
+    {
+      "name": "管理员-订单管理"
+    },
+    {
+      "name": "管理员-跑腿任务管理"
+    },
+    {
+      "name": "管理员-退款管理"
+    },
+    {
+      "name": "系统公告接口"
+    },
+    {
+      "name": "聊天管理"
+    },
+    {
+      "name": "角色申请"
+    },
+    {
+      "name": "评价回复"
+    },
+    {
+      "name": "评价管理"
+    },
+    {
+      "name": "购物记录"
+    },
+    {
+      "name": "购物车管理"
+    },
+    {
+      "name": "跑腿订单管理"
+    },
+    {
+      "name": "退款"
+    },
+    {
+      "name": "钱包管理"
+    }
+  ],
+  "paths": {
+    "/addresses": {
+      "get": {
+        "tags": [
+          "地址管理"
+        ],
+        "summary": "获取地址列表",
+        "description": "获取当前登录用户的所有收货地址",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "地址管理"
+        ],
+        "summary": "创建新地址",
+        "description": "创建新的收货地址",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/addresses/{id}": {
+      "put": {
+        "tags": [
+          "地址管理"
+        ],
+        "summary": "更新地址",
+        "description": "更新指定ID的收货地址信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "地址管理"
+        ],
+        "summary": "删除地址",
+        "description": "删除指定ID的收货地址",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/addresses/{id}/default": {
+      "patch": {
+        "tags": [
+          "地址管理"
+        ],
+        "summary": "设置默认地址",
+        "description": "将指定地址设置为默认收货地址",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/complaints": {
+      "get": {
+        "tags": [
+          "管理员-投诉管理"
+        ],
+        "summary": "查看所有投诉",
+        "description": "管理员查看平台所有投诉记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/complaints/stats": {
+      "get": {
+        "tags": [
+          "管理员-投诉管理"
+        ],
+        "summary": "统计投诉状态",
+        "description": "统计不同状态的投诉数量",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/complaints/{id}/resolve": {
+      "post": {
+        "tags": [
+          "管理员-投诉管理"
+        ],
+        "summary": "处理投诉",
+        "description": "管理员处理用户投诉",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "管理员-用户管理"
+        ],
+        "summary": "搜索用户",
+        "description": "根据条件搜索用户列表",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "管理员-用户管理"
+        ],
+        "summary": "更新用户状态",
+        "description": "启用或禁用指定用户",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/users/{id}/type": {
+      "patch": {
+        "tags": [
+          "管理员-用户管理"
+        ],
+        "summary": "更新用户角色",
+        "description": "修改指定用户的角色",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/errands": {
+      "get": {
+        "tags": [
+          "管理员-跑腿任务管理"
+        ],
+        "summary": "搜索跑腿任务",
+        "description": "根据条件搜索平台所有跑腿任务",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/errands/pending": {
+      "get": {
+        "tags": [
+          "管理员-跑腿任务管理"
+        ],
+        "summary": "查看待审核跑腿任务",
+        "description": "查看所有待审核的跑腿任务",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/errands/{id}/status": {
+      "patch": {
+        "tags": [
+          "管理员-跑腿任务管理"
+        ],
+        "summary": "更新跑腿任务状态",
+        "description": "强制更新指定跑腿任务的状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/errands/{id}/approve": {
+      "patch": {
+        "tags": [
+          "管理员-跑腿任务管理"
+        ],
+        "summary": "审核通过跑腿任务",
+        "description": "审核通过指定跑腿任务，设置为待接单状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/errands/{id}/reject": {
+      "patch": {
+        "tags": [
+          "管理员-跑腿任务管理"
+        ],
+        "summary": "审核拒绝跑腿任务",
+        "description": "审核拒绝指定跑腿任务，设置为审核拒绝状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/orders/products": {
+      "get": {
+        "tags": [
+          "管理员-订单管理"
+        ],
+        "summary": "搜索商品订单",
+        "description": "管理员按条件搜索全平台商品订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/orders/products/{orderNo}/status": {
+      "patch": {
+        "tags": [
+          "管理员-订单管理"
+        ],
+        "summary": "强制修改商品订单状态",
+        "description": "管理员强制修改订单状态（含强制取消）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/products": {
+      "get": {
+        "tags": [
+          "管理员-商品管理"
+        ],
+        "summary": "搜索商品",
+        "description": "根据条件搜索平台所有商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/products/pending": {
+      "get": {
+        "tags": [
+          "管理员-商品管理"
+        ],
+        "summary": "查看待审核商品",
+        "description": "查看所有待审核的商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/products/{id}/status": {
+      "patch": {
+        "tags": [
+          "管理员-商品管理"
+        ],
+        "summary": "更新商品状态",
+        "description": "强制上架或下架指定商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/products/{id}/approve": {
+      "patch": {
+        "tags": [
+          "管理员-商品管理"
+        ],
+        "summary": "审核通过商品",
+        "description": "审核通过指定商品，设置为上架状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/products/{id}/reject": {
+      "patch": {
+        "tags": [
+          "管理员-商品管理"
+        ],
+        "summary": "审核拒绝商品",
+        "description": "审核拒绝指定商品，设置为审核拒绝状态",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/refunds": {
+      "get": {
+        "tags": [
+          "管理员-退款管理"
+        ],
+        "summary": "退款列表",
+        "description": "按订单类型、状态筛选",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/refunds/{id}": {
+      "get": {
+        "tags": [
+          "管理员-退款管理"
+        ],
+        "summary": "退款详情",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/refunds/{id}/approve": {
+      "post": {
+        "tags": [
+          "管理员-退款管理"
+        ],
+        "summary": "同意退款",
+        "description": "管理员同意并执行退款",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/refunds/{id}/reject": {
+      "post": {
+        "tags": [
+          "管理员-退款管理"
+        ],
+        "summary": "拒绝退款",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/role-applications": {
+      "get": {
+        "tags": [
+          "管理员-角色申请管理"
+        ],
+        "summary": "搜索角色申请",
+        "description": "按用户/目标角色/状态搜索角色申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/role-applications/{id}/approve": {
+      "post": {
+        "tags": [
+          "管理员-角色申请管理"
+        ],
+        "summary": "审批通过",
+        "description": "管理员通过角色申请并修改用户角色",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/role-applications/{id}/reject": {
+      "post": {
+        "tags": [
+          "管理员-角色申请管理"
+        ],
+        "summary": "审批拒绝",
+        "description": "管理员拒绝角色申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "查询购物车",
+        "description": "返回购物车条目及商品信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/cart/add": {
+      "post": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "加入购物车",
+        "description": "将商品加入购物车（存在则数量累加）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/cart/{productId}": {
+      "put": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "设置商品数量",
+        "description": "设置购物车某商品的数量",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "移除商品",
+        "description": "从购物车中移除指定商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/cart/clear": {
+      "post": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "清空购物车",
+        "description": "清空当前用户购物车",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "分类管理"
+        ],
+        "summary": "获取分类列表",
+        "description": "获取商品分类列表，可指定父分类ID",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "分类管理"
+        ],
+        "summary": "创建分类",
+        "description": "创建新的商品分类（仅商家）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "tags": [
+          "分类管理"
+        ],
+        "summary": "更新分类",
+        "description": "更新商品分类信息（仅商家）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/categories/{id}/status": {
+      "patch": {
+        "tags": [
+          "分类管理"
+        ],
+        "summary": "更新分类状态",
+        "description": "更新商品分类状态（启用/禁用）（仅商家）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/chat/send": {
+      "post": {
+        "tags": [
+          "聊天管理"
+        ],
+        "summary": "发送消息",
+        "description": "发送一条新的聊天消息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/chat/history": {
+      "get": {
+        "tags": [
+          "聊天管理"
+        ],
+        "summary": "获取历史消息",
+        "description": "查询两个用户之间的历史聊天记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/chat/read": {
+      "post": {
+        "tags": [
+          "聊天管理"
+        ],
+        "summary": "标记已读",
+        "description": "将对方发送给我的消息标记为已读",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/complaints/submit": {
+      "post": {
+        "tags": [
+          "投诉管理"
+        ],
+        "summary": "提交投诉",
+        "description": "用户提交新的投诉信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/complaints/resolve": {
+      "post": {
+        "tags": [
+          "投诉管理"
+        ],
+        "summary": "处理投诉",
+        "description": "管理员或客服处理用户投诉",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/complaints/my": {
+      "get": {
+        "tags": [
+          "投诉管理"
+        ],
+        "summary": "我的投诉",
+        "description": "查询当前用户提交的所有投诉记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/coupons/add": {
+      "post": {
+        "tags": [
+          "优惠券管理"
+        ],
+        "summary": "创建优惠券",
+        "description": "商家或管理员创建新的优惠券",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/coupons/list": {
+      "get": {
+        "tags": [
+          "优惠券管理"
+        ],
+        "summary": "查询可领取优惠券",
+        "description": "获取当前所有有效且可领取的优惠券",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/coupons/receive": {
+      "post": {
+        "tags": [
+          "优惠券管理"
+        ],
+        "summary": "领取优惠券",
+        "description": "用户领取指定的优惠券",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/coupons/my": {
+      "get": {
+        "tags": [
+          "优惠券管理"
+        ],
+        "summary": "我的优惠券",
+        "description": "查询用户已领取的优惠券，可按状态筛选",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/create": {
+      "post": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "发布跑腿订单",
+        "description": "用户发布新的跑腿订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/take": {
+      "post": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "接单",
+        "description": "跑腿员接取订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/complete": {
+      "post": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "完成订单",
+        "description": "跑腿员或用户确认订单完成",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/open": {
+      "get": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "查询待接单订单",
+        "description": "获取所有状态为'待接单'的跑腿订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/my": {
+      "get": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "我的订单",
+        "description": "查询用户发布或接取的跑腿订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/errands/runner": {
+      "get": {
+        "tags": [
+          "跑腿订单管理"
+        ],
+        "summary": "跑腿任务",
+        "description": "查询跑腿员接取的订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/notices/publish": {
+      "post": {
+        "tags": [
+          "系统公告接口"
+        ],
+        "summary": "发布公告(管理员)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/notices/update": {
+      "put": {
+        "tags": [
+          "系统公告接口"
+        ],
+        "summary": "更新公告(管理员)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/notices/{id}": {
+      "delete": {
+        "tags": [
+          "系统公告接口"
+        ],
+        "summary": "删除公告(管理员)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/admin/notices/all": {
+      "get": {
+        "tags": [
+          "系统公告接口"
+        ],
+        "summary": "获取所有公告(管理员)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/notices/visible": {
+      "get": {
+        "tags": [
+          "系统公告接口"
+        ],
+        "summary": "获取可见公告(用户/跑腿/商家)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "创建订单",
+        "description": "创建新的商品订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "我的订单",
+        "description": "获取当前用户的订单列表",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}/pay": {
+      "post": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "支付订单",
+        "description": "模拟支付订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}/cancel": {
+      "post": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "取消订单",
+        "description": "取消未完成的订单",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}/ship": {
+      "post": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "订单发货",
+        "description": "商家对订单进行发货操作",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}/confirm": {
+      "post": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "确认收货",
+        "description": "用户确认收到商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/seller": {
+      "get": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "商家订单",
+        "description": "获取商家的订单列表（仅商家）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}": {
+      "get": {
+        "tags": [
+          "商品订单"
+        ],
+        "summary": "订单详情",
+        "description": "获取订单的详细信息及商品项",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "搜索商品",
+        "description": "根据条件搜索商品列表",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "创建商品",
+        "description": "商家发布新商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "商品详情",
+        "description": "根据ID获取商品详细信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更新商品",
+        "description": "商家更新商品信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/products/{id}/status": {
+      "patch": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更改商品状态",
+        "description": "商家上架或下架商品",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/products/{id}/stock": {
+      "patch": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "调整库存",
+        "description": "商家调整商品库存",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/apply": {
+      "post": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "申请退款",
+        "description": "用户对已支付订单申请退款",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/my": {
+      "get": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "我的退款列表",
+        "description": "当前用户发起的退款申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/seller": {
+      "get": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "商家-退款列表",
+        "description": "商家查看本店铺订单的退款申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/runner": {
+      "get": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "跑腿员-退款列表",
+        "description": "跑腿员查看本人接单的退款申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/{id}/approve": {
+      "post": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "同意退款",
+        "description": "商家/跑腿员/管理员同意并执行退款",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/{id}/reject": {
+      "post": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "拒绝退款",
+        "description": "商家/跑腿员/管理员拒绝退款",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/refunds/{id}": {
+      "get": {
+        "tags": [
+          "退款"
+        ],
+        "summary": "退款详情",
+        "description": "根据ID查询退款申请详情",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/orders/{orderNo}/reviews": {
+      "post": {
+        "tags": [
+          "评价管理"
+        ],
+        "summary": "添加评价",
+        "description": "对已完成的订单进行评价",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/products/{productId}/reviews": {
+      "get": {
+        "tags": [
+          "评价管理"
+        ],
+        "summary": "商品评价",
+        "description": "获取指定商品的评价列表",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/reviews/{reviewId}/replies": {
+      "get": {
+        "tags": [
+          "评价回复"
+        ],
+        "summary": "回复列表",
+        "description": "获取指定评价的回复列表",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "评价回复"
+        ],
+        "summary": "添加回复",
+        "description": "对评价进行回复",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/role-applications": {
+      "post": {
+        "tags": [
+          "角色申请"
+        ],
+        "summary": "提交角色申请",
+        "description": "当前登录用户提交角色变更申请",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/role-applications/mine": {
+      "get": {
+        "tags": [
+          "角色申请"
+        ],
+        "summary": "我的角色申请",
+        "description": "查看当前用户的角色申请记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/shopping-records": {
+      "get": {
+        "tags": [
+          "购物记录"
+        ],
+        "summary": "查询我的购物记录",
+        "description": "查询当前登录用户的购物记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/shopping-records/{recordId}": {
+      "delete": {
+        "tags": [
+          "购物记录"
+        ],
+        "summary": "删除购物记录",
+        "description": "删除我的一条购物记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/shopping-records/batch": {
+      "delete": {
+        "tags": [
+          "购物记录"
+        ],
+        "summary": "批量删除购物记录",
+        "description": "根据记录ID列表批量删除当前用户的购物记录",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/send-code": {
+      "get": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "发送邮箱验证码",
+        "description": "向指定邮箱发送注册/登录验证码",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "用户注册",
+        "description": "新用户注册",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/query": {
+      "get": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "查询用户列表",
+        "description": "获取所有用户列表（不含密码）",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/query/{phone}": {
+      "get": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "根据手机号查询",
+        "description": "根据手机号获取用户信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "用户登录",
+        "description": "用户登录并获取Token",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "获取个人信息",
+        "description": "获取当前登录用户的详细信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/update": {
+      "put": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "修改用户信息",
+        "description": "更新当前用户的个人信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "用户认证"
+        ],
+        "summary": "退出登录",
+        "description": "退出登录并清理客户端令牌",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/wallet/transactions": {
+      "get": {
+        "tags": [
+          "钱包管理"
+        ],
+        "summary": "获取交易记录",
+        "description": "查询当前登录用户的钱包交易明细",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/wallet/recharge": {
+      "post": {
+        "tags": [
+          "钱包管理"
+        ],
+        "summary": "钱包充值",
+        "description": "用户进行钱包充值",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/wanted/create": {
+      "post": {
+        "tags": [
+          "二手求购管理"
+        ],
+        "summary": "发布求购",
+        "description": "发布新的二手求购信息",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/wanted/status": {
+      "post": {
+        "tags": [
+          "二手求购管理"
+        ],
+        "summary": "更新状态",
+        "description": "更新求购信息的状态 (如：1-求购中, 2-已买到)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    },
+    "/api/wanted/list": {
+      "get": {
+        "tags": [
+          "二手求购管理"
+        ],
+        "summary": "获取求购列表",
+        "description": "查询求购信息列表，可按状态筛选",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "code": 1,
+                      "msg": "success",
+                      "data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JWT token（项目使用请求头 token）"
+          }
+        ]
+      }
+    }
+  }
+}
