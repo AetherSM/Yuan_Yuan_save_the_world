@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import http from '../services/http'
-import { ElMessage, ElInputNumber, ElRate } from 'element-plus'
+import { ElMessage, ElInputNumber, ElRate, ElDialog, ElScrollbar } from 'element-plus'
+import { ChatLineRound } from '@element-plus/icons-vue'
 const route = useRoute()
 const id = Number(route.params.id)
 const product = ref(null)
@@ -17,6 +18,95 @@ const newAddress = ref({ contactName: '', contactPhone: '', address: '', buildin
 const reviews = ref([])
 const replies = ref(new Map())
 const replyContent = ref(new Map())
+
+const userId = Number(localStorage.getItem('userId'))
+const chatVisible = ref(false)
+const chatMessages = ref([])
+const newMessage = ref('')
+const chatLoading = ref(false)
+const scrollbarRef = ref(null)
+let socket = null
+
+const initWebSocket = () => {
+  if (!userId) return
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  // 根据实际后端地址配置，如果是本地开发则通常是 localhost:8080
+  socket = new WebSocket(`${protocol}//localhost:8080/ws/${userId}`)
+  
+  socket.onmessage = (event) => {
+    if (event.data === 'NEW_MSG') {
+      // 收到推送，立刻刷新历史记录
+      loadChatHistory()
+    }
+  }
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed, retrying...')
+    setTimeout(initWebSocket, 3000)
+  }
+}
+
+const openChat = async () => {
+  if (!userId) {
+    ElMessage.warning('请先登录再进行咨询')
+    return
+  }
+  chatVisible.value = true
+  initWebSocket()
+  await loadChatHistory()
+}
+
+const loadChatHistory = async () => {
+  if (!product.value?.sellerId) return
+  chatLoading.value = true
+  try {
+    const { data } = await http.get('/common/chat/history', {
+      params: { userId1: userId, userId2: product.value.sellerId }
+    })
+    if (data && data.code === 1) {
+      chatMessages.value = data.data || []
+      scrollToBottom()
+    }
+  } catch (e) {
+    console.error('加载聊天记录失败', e)
+  } finally {
+    chatLoading.value = false
+  }
+}
+
+const sendMessage = async () => {
+  if (!newMessage.value.trim()) return
+  try {
+    const { data } = await http.post('/common/chat/send', null, {
+      params: {
+        senderId: userId,
+        receiverId: product.value.sellerId,
+        content: newMessage.value.trim(),
+        type: 1
+      }
+    })
+    if (data && data.code === 1) {
+      chatMessages.value.push({
+        senderId: userId,
+        receiverId: product.value.sellerId,
+        content: newMessage.value.trim(),
+        createTime: new Date().toISOString()
+      })
+      newMessage.value = ''
+      scrollToBottom()
+    }
+  } catch (e) {
+    ElMessage.error('消息发送失败')
+  }
+}
+
+const scrollToBottom = () => {
+  setTimeout(() => {
+    if (scrollbarRef.value) {
+      scrollbarRef.value.setScrollTop(999999)
+    }
+  }, 100)
+}
 const load = async () => {
   loading.value = true
   error.value = ''
@@ -45,6 +135,10 @@ onMounted(async () => {
     }
   } catch (e) {}
 })
+onBeforeUnmount(() => {
+  if (socket) socket.close()
+})
+
 const addToCart = async () => {
   try {
     const { data } = await http.post('/api/cart/add', null, { params: { productId: id, quantity: qty.value } })
@@ -165,6 +259,10 @@ const submitReply = async (reviewId) => {
           <el-input-number v-model="qty" :min="1" />
         </div>
         <div class="actions">
+          <button class="btn chat" @click="openChat">
+            <el-icon><ChatLineRound /></el-icon>
+            联系商家
+          </button>
           <button class="btn cart" @click="addToCart">加入购物车</button>
           <button class="btn primary" @click="openBuy">立即购买</button>
         </div>
@@ -226,6 +324,34 @@ const submitReply = async (reviewId) => {
       </div>
     </template>
   </el-dialog>
+
+  <!-- 聊天弹窗 -->
+  <el-dialog v-model="chatVisible" title="联系商家" width="600px" custom-class="chat-dialog">
+    <div class="chat-container">
+      <el-scrollbar ref="scrollbarRef" height="400px">
+        <div v-for="(msg, index) in chatMessages" :key="index" class="message-wrapper" :class="{'mine': msg.senderId === userId}">
+          <div class="message-content">
+            {{ msg.content }}
+          </div>
+          <div class="message-time">{{ new Date(msg.createTime).toLocaleString() }}</div>
+        </div>
+        <div v-if="chatMessages.length === 0" class="chat-empty">暂无聊天记录，打个招呼吧～</div>
+      </el-scrollbar>
+      <div class="chat-input-area">
+        <el-input
+          v-model="newMessage"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入您想咨询的问题..."
+          @keyup.enter.ctrl="sendMessage"
+        />
+        <div class="chat-ops">
+          <span class="tip">Ctrl + Enter 快速发送</span>
+          <el-button type="primary" @click="sendMessage" :disabled="!newMessage.trim()">发送</el-button>
+        </div>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped>
@@ -247,7 +373,8 @@ const submitReply = async (reviewId) => {
 .buy-area{display:flex;flex-direction:column;gap:12px}
 .qty-line{display:flex;align-items:center;gap:12px}
 .actions{display:flex;gap:12px}
-.btn{padding:10px 16px;border:none;border-radius:10px;background:#e5e7eb;color:#111827;cursor:pointer}
+.btn{padding:10px 16px;border:none;border-radius:10px;background:#e5e7eb;color:#111827;cursor:pointer;display:flex;align-items:center;gap:4px}
+.btn.chat{background:#f0f9ff;color:#0369a1}
 .btn.cart{background:#ffedd5;color:#b45309}
 .btn.primary{background:#ff1f2d;color:#fff}
 .empty{padding:24px;text-align:center;color:#999}
@@ -271,4 +398,16 @@ const submitReply = async (reviewId) => {
 .rp-user{font-weight:600;color:#111827;margin-right:6px}
 .rv-reply-box{display:flex;gap:8px;align-items:center}
 .reply-input{flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px}
+
+/* 聊天样式 */
+.chat-container{display:flex;flex-direction:column;gap:12px}
+.message-wrapper{display:flex;flex-direction:column;align-items:flex-start;margin-bottom:12px}
+.message-wrapper.mine{align-items:flex-end}
+.message-content{max-width:80%;padding:10px 14px;border-radius:12px;background:#f3f4f6;color:#1f2937;font-size:14px}
+.mine .message-content{background:#3b82f6;color:#fff}
+.message-time{font-size:12px;color:#9ca3af;margin-top:4px}
+.chat-empty{padding:40px;text-align:center;color:#9ca3af}
+.chat-input-area{margin-top:12px;border-top:1px solid #e5e7eb;padding-top:12px}
+.chat-ops{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.chat-ops .tip{font-size:12px;color:#9ca3af}
 </style>

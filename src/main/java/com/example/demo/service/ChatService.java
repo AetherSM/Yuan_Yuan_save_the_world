@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.pojo.entity.ChatMessage;
+import com.example.demo.pojo.vo.ChatSessionVO;
 import java.util.List;
 
 /**
@@ -31,4 +32,11 @@ public interface ChatService {
      * @param receiverId 接收者ID (自己)
      */
     void markRead(Long senderId, Long receiverId);
+
+    /**
+     * 获取商家的会话列表
+     * @param merchantId 商家用户ID
+     * @return 会话列表
+     */
+    List<ChatSessionVO> getSessions(Long merchantId);
 }

@@ -7,6 +7,7 @@ import MerchantProducts from '../views/MerchantProducts.vue'
 import MerchantOrders from '../views/MerchantOrders.vue'
 import MerchantReviews from '../views/MerchantReviews.vue'
 import MerchantCoupons from '../views/MerchantCoupons.vue'
+import MerchantMessages from '../views/MerchantMessages.vue'
 import My from '../views/My.vue'
 import ProductList from '../views/ProductList.vue'
 import ProductDetail from '../views/ProductDetail.vue'
@@ -38,6 +39,7 @@ const routes = [
   { path: '/merchant/orders', component: MerchantOrders, meta: { requiresAuth: true } },
   { path: '/merchant/reviews', component: MerchantReviews, meta: { requiresAuth: true } },
   { path: '/merchant/coupons', component: MerchantCoupons, meta: { requiresAuth: true } },
+  { path: '/merchant/messages', component: MerchantMessages, meta: { requiresAuth: true } },
   { path: '/my', component: My, meta: { requiresAuth: true } },
   { path: '/orders', redirect: '/my?tab=orders' },
   { path: '/wallet', redirect: '/my?tab=wallet' },

@@ -68,14 +68,14 @@ INSERT INTO product_orders (order_no, user_id, seller_id, total_amount, delivery
 ('P202310010001', 3, 1, 15.00, '紫荆公寓2号楼301', '张三', '13800000003', 1, NOW());
 
 INSERT INTO order_items (order_id, product_id, product_name, product_image, price, quantity, subtotal) VALUES
-(1, 1, '可口可乐 330ml', 'https://example.com/coke.jpg', 3.00, 5, 15.00);
+(1, 1, '可口可乐 330ml', '/uploads/products/coke.png', 3.00, 5, 15.00);
 
 -- 订单2: 已完成 (李四买辣条)
 INSERT INTO product_orders (order_no, user_id, seller_id, total_amount, delivery_address, contact_name, contact_phone, order_status, pay_time, ship_time, confirm_time, create_time) VALUES
 ('P202310010002', 4, 1, 25.00, '紫荆公寓3号楼402', '李四', '13800000004', 4, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY));
 
 INSERT INTO order_items (order_id, product_id, product_name, product_image, price, quantity, subtotal) VALUES
-(2, 2, '卫龙辣条', 'https://example.com/latiao.jpg', 5.00, 5, 25.00);
+(2, 2, '卫龙辣条', '/uploads/products/latiao.png', 5.00, 5, 25.00);
 
 -- 9. 插入钱包流水
 -- 张三充值
@@ -100,3 +100,9 @@ INSERT INTO chat_messages (sender_id, receiver_id, content, msg_type, is_read, c
 -- 13. 插入投诉
 INSERT INTO complaints (order_id, order_type, complainant_id, reason, status, create_time) VALUES
 (2, 1, 4, '物流太慢', 0, NOW());
+
+-- 14. 插入购物记录 (用户ID: 3, 4)
+INSERT INTO shopping_records (user_id, order_no, product_id, product_name, product_image, price, quantity, subtotal, created_at) VALUES
+(3, 'P202310010001', 1, '可口可乐 330ml', '/uploads/products/coke.png', 3.00, 5, 15.00, DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(4, 'P202310010002', 2, '卫龙辣条', '/uploads/products/latiao.png', 5.00, 5, 25.00, DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(3, 'P202310010003', 3, 'Java编程思想', '/uploads/products/java_book.png', 45.00, 1, 45.00, DATE_SUB(NOW(), INTERVAL 5 HOUR));

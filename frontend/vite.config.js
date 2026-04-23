@@ -14,6 +14,10 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true
       },
+      '/categories': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true
@@ -43,6 +47,38 @@ export default defineConfig({
         changeOrigin: true
       },
       '/wallet': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/complaints': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/coupons': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/errands': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/notices': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/reviews': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/shopping-records': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/users': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/wanted-posts': {
         target: 'http://localhost:8080',
         changeOrigin: true
       },

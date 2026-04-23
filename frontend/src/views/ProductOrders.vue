@@ -135,6 +135,42 @@ const confirm = async (orderNo) => {
 const viewDetail = (orderNo) => {
   router.push(`/order/${orderNo}`)
 }
+
+const reviewVisible = ref(false)
+const currentOrderNo = ref('')
+const rating = ref(5)
+const content = ref('')
+
+const openReview = (orderNo) => {
+  currentOrderNo.value = orderNo
+  rating.value = 5
+  content.value = ''
+  reviewVisible.value = true
+}
+
+const submitReview = async () => {
+  if (!content.value.trim()) {
+    ElMessage.warning('请填写评价内容')
+    return
+  }
+  try {
+    const body = { 
+      rating: rating.value, 
+      content: content.value, 
+      orderType: 1 // 1-商品订单
+    }
+    const { data } = await http.post(`/orders/${currentOrderNo.value}/reviews`, body)
+    if (data && data.code === 1) {
+      ElMessage.success('评价成功')
+      reviewVisible.value = false
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '评价失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  }
+}
 </script>
 
 <template>
@@ -166,6 +202,7 @@ const viewDetail = (orderNo) => {
       <div class="ops" @click.stop>
         <button v-if="o.orderStatus===1" class="btn gray" @click="cancel(o.orderNo)">取消订单</button>
         <button v-if="o.orderStatus===3" class="btn" @click="confirm(o.orderNo)">确认收货</button>
+        <button v-if="o.orderStatus===4" class="btn gray" @click="openReview(o.orderNo)">评价商品</button>
         <button v-if="canRefund(o)" class="btn warn" @click="openRefund(o)">申请退款</button>
         <button class="btn danger" @click="openComplaint(o)">投诉</button>
       </div>
@@ -194,6 +231,24 @@ const viewDetail = (orderNo) => {
     </el-dialog>
     <div v-if="!loading && list.length===0" class="empty">暂无订单</div>
     <div v-if="error" class="error">{{ error }}</div>
+
+    <!-- 评价弹窗 -->
+    <el-dialog v-model="reviewVisible" title="评价商品" width="500px">
+      <div class="review-form">
+        <div class="form-item">
+          <label>评分：</label>
+          <el-rate v-model="rating" :max="5" />
+        </div>
+        <div class="form-item">
+          <label>评价内容：</label>
+          <el-input v-model="content" type="textarea" :rows="4" placeholder="请分享您的使用体验" />
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="reviewVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitReview">提交评价</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -215,4 +270,8 @@ const viewDetail = (orderNo) => {
 .refund-form p{margin:10px 0}
 .empty{padding:24px;text-align:center;color:#999}
 .error{padding:12px;color:#d33}
+
+.review-form{display:flex;flex-direction:column;gap:16px}
+.form-item{display:flex;flex-direction:column;gap:8px}
+.form-item label{font-weight:600;color:#374151}
 </style>

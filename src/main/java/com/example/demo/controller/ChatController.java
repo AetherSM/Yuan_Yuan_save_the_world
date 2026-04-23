@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Tag(name = "聊天管理", description = "即时通讯消息发送与查询")
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/common/chat")
 public class ChatController {
 
     @Autowired
@@ -68,5 +68,17 @@ public class ChatController {
             @Parameter(description = "接收者ID (自己)", required = true) @RequestParam Long receiverId) {
         chatService.markRead(senderId, receiverId);
         return Result.success("已标记为已读");
+    }
+
+    /**
+     * 获取商家的会话列表
+     * @param merchantId 商家用户ID
+     * @return 会话列表
+     */
+    @Operation(summary = "获取会话列表", description = "查询与商家有过沟通的用户列表")
+    @GetMapping("/sessions")
+    public Result<List<com.example.demo.pojo.vo.ChatSessionVO>> getSessions(
+            @Parameter(description = "商家ID", required = true) @RequestParam Long merchantId) {
+        return Result.success(chatService.getSessions(merchantId));
     }
 }

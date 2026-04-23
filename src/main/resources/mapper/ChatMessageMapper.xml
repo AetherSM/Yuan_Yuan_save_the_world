@@ -27,4 +27,27 @@
         update chat_messages set is_read = 1
         where sender_id = #{senderId} and receiver_id = #{receiverId} and is_read = 0
     </update>
+
+    <select id="listSessions" resultType="com.example.demo.pojo.vo.ChatSessionVO">
+        SELECT 
+            u.user_id as userId,
+            u.phone as username,
+            u.nickname as nickname,
+            u.avatar as avatar,
+            t.content as lastMsg,
+            t.create_time as lastTime,
+            (SELECT COUNT(*) FROM chat_messages WHERE sender_id = u.user_id AND receiver_id = #{merchantId} AND is_read = 0) as unreadCount
+        FROM (
+            /* 找出每个跟商家聊过天的用户，并拿到最后一次聊天的消息ID */
+            SELECT 
+                IF(sender_id = #{merchantId}, receiver_id, sender_id) as other_id,
+                MAX(message_id) as max_id
+            FROM chat_messages
+            WHERE sender_id = #{merchantId} OR receiver_id = #{merchantId}
+            GROUP BY other_id
+        ) latest
+        JOIN users u ON u.user_id = latest.other_id
+        JOIN chat_messages t ON t.message_id = latest.max_id
+        ORDER BY lastTime DESC
+    </select>
 </mapper>

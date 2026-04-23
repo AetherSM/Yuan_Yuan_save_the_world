@@ -22,6 +22,7 @@ const status = ref(1)
 const message = ref('')
 const loading = ref(false)
 const uploadLoading = ref(false)
+const categories = ref([])
 
 const imageUrl = computed(() => {
   if (!mainImage.value) return ''
@@ -75,12 +76,24 @@ const handleUploadError = (err) => {
 }
 
 onMounted(async () => {
+  await loadCategories()
   if (route.query.id) {
     isEdit.value = true
     productId.value = route.query.id
     await loadProduct()
   }
 })
+
+const loadCategories = async () => {
+  try {
+    const { data } = await http.get('/categories')
+    if (data && data.code === 1) {
+      categories.value = data.data || []
+    }
+  } catch (e) {
+    console.error('加载分类失败:', e)
+  }
+}
 
 const loadProduct = async () => {
   try {
@@ -156,7 +169,17 @@ const submit = async () => {
     <h2>{{ isEdit ? '编辑商品' : '发布商品' }}</h2>
     <div class="row"><label>名称</label><el-input v-model="productName" placeholder="请输入商品名称" /></div>
     <div class="row"><label>描述</label><el-input v-model="description" type="textarea" :rows="4" placeholder="请输入商品描述" /></div>
-    <div class="row"><label>分类ID</label><el-input-number v-model="categoryId" :min="1" /></div>
+    <div class="row">
+      <label>商品分类</label>
+      <el-select v-model="categoryId" placeholder="请选择商品分类">
+        <el-option
+          v-for="item in categories"
+          :key="item.categoryId"
+          :label="item.categoryName"
+          :value="item.categoryId"
+        />
+      </el-select>
+    </div>
     <div class="row"><label>价格</label><el-input-number v-model="price" :min="0" :step="0.01" /></div>
     <div class="row"><label>原价</label><el-input-number v-model="originalPrice" :min="0" :step="0.01" /></div>
     <div class="row"><label>库存</label><el-input-number v-model="stock" :min="0" /></div>

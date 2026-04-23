@@ -1,0 +1,42 @@
+package com.example.demo.config;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+public class RedisConfig {
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        
+        // 使用 String 序列化 Key
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        
+        // 配置 ObjectMapper 处理 Java 8 时间类型
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 注册 JavaTimeModule
+        om.registerModule(new JavaTimeModule());
+        // 禁用将时间写为时间戳
+        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        // 使用 JSON 序列化 Value
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(om);
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+        
+        return template;
+    }
+}
