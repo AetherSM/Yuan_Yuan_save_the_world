@@ -10,6 +10,10 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true
       },
+      '/common': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true
@@ -39,6 +43,10 @@ export default defineConfig({
         changeOrigin: true
       },
       '/wallet': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+      '/uploads': {
         target: 'http://localhost:8080',
         changeOrigin: true
       }

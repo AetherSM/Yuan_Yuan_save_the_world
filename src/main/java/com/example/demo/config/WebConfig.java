@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.File;
 
 /**
  * Web配置类
@@ -15,6 +18,19 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private JwtInterceptor jwtInterceptor;
+
+    /**
+     * 配置静态资源映射
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 获取当前项目的绝对路径，并将 /uploads/** 映射到项目根目录下的 uploads 文件夹
+        String projectPath = System.getProperty("user.dir");
+        String uploadPath = "file:" + projectPath + File.separator + "uploads" + File.separator;
+        
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(uploadPath);
+    }
 
     /**
      * 配置拦截器
@@ -28,7 +44,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/auth/register",  // 排除注册接口
                         "/auth/send-code", // 排除获取验证码接口
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/uploads/**"      // 排除图片资源
                 );
     }
 

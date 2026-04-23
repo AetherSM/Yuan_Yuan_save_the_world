@@ -26,11 +26,11 @@ INSERT INTO categories (category_id, category_name, parent_id, sort_order, statu
 
 -- 4. 插入商品数据 (商家ID: 1)
 INSERT INTO products (product_id, seller_id, category_id, product_name, description, price, original_price, stock, sales_count, main_image, status) VALUES
-(1, 1, 5, '可口可乐 330ml', '碳酸饮料，快乐水', 3.00, 3.50, 100, 50, 'https://example.com/coke.jpg', 1),
-(2, 1, 5, '卫龙辣条', '童年回忆，经典美味', 5.00, 6.00, 200, 100, 'https://example.com/latiao.jpg', 1),
-(3, 1, 6, 'Java编程思想', '经典Java教材，二手九成新', 45.00, 99.00, 1, 0, 'https://example.com/java_book.jpg', 1),
-(4, 1, 3, '二手机械键盘', 'Cherry青轴，手感极佳', 150.00, 400.00, 1, 0, 'https://example.com/keyboard.jpg', 1),
-(5, 1, 4, '洗衣液 2kg', '深层清洁，护衣护色', 25.00, 39.90, 50, 10, 'https://example.com/detergent.jpg', 1);
+(1, 1, 5, '可口可乐 330ml', '碳酸饮料，快乐水', 3.00, 3.50, 100, 50, '/uploads/products/coke.png', 1),
+(2, 1, 5, '卫龙辣条', '童年回忆，经典美味', 5.00, 6.00, 200, 100, '/uploads/products/latiao.png', 1),
+(3, 1, 6, 'Java编程思想', '经典Java教材，二手九成新', 45.00, 99.00, 1, 0, '/uploads/products/java_book.png', 1),
+(4, 1, 3, '二手机械键盘', 'Cherry青轴，手感极佳', 150.00, 400.00, 1, 0, '/uploads/products/keyboard.png', 1),
+(5, 1, 4, '洗衣液 2kg', '深层清洁，护衣护色', 25.00, 39.90, 50, 10, '/uploads/products/detergent.png', 1);
 
 -- 5. 插入优惠券
 INSERT INTO coupons (coupon_id, name, type, value, min_spend, start_time, end_time, status) VALUES
