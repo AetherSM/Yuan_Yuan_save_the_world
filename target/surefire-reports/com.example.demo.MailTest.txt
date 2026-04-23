@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.example.demo.MailTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.587 s -- in com.example.demo.MailTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.465 s -- in com.example.demo.MailTest
