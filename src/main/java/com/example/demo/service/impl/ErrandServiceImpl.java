@@ -44,7 +44,23 @@ public class ErrandServiceImpl implements ErrandService {
     public void takeOrder(String orderNo, Long runnerId) {
         int updated = errandOrderMapper.updateStatus(orderNo, 2, runnerId);
         if (updated == 0) {
-            throw new IllegalStateException("接单失败");
+            throw new IllegalStateException("接单失败或订单已被抢走");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startDelivery(String orderNo) {
+        ErrandOrder order = errandOrderMapper.findByOrderNo(orderNo);
+        if (order == null) {
+            throw new IllegalArgumentException("订单不存在");
+        }
+        if (order.getOrderStatus() != 2) {
+            throw new IllegalArgumentException("订单状态不正确，无法开始配送");
+        }
+        int updated = errandOrderMapper.updateStatus(orderNo, 3, null);
+        if (updated == 0) {
+            throw new IllegalStateException("更新状态失败");
         }
     }
 
@@ -55,13 +71,18 @@ public class ErrandServiceImpl implements ErrandService {
         if (order == null) {
             throw new IllegalArgumentException("订单不存在");
         }
-        if (order.getOrderStatus() != 3) {
-            throw new IllegalArgumentException("订单状态不允许完成");
+        // 允许从状态 2 (已接单) 或 3 (配送中) 完成
+        if (order.getOrderStatus() != 2 && order.getOrderStatus() != 3) {
+            throw new IllegalArgumentException("当前订单状态不允许确认完成");
+        }
+        
+        if (order.getRunnerId() == null) {
+            throw new IllegalStateException("订单异常：未分配跑腿员");
         }
         
         // 计算总金额（优先使用 totalAmount 字段，否则按赏金 + 小费计算）
         java.math.BigDecimal totalAmount = order.getTotalAmount();
-        if (totalAmount == null) {
+        if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) == 0) {
             java.math.BigDecimal reward = order.getReward() != null ? order.getReward() : java.math.BigDecimal.ZERO;
             java.math.BigDecimal tip = order.getTip() != null ? order.getTip() : java.math.BigDecimal.ZERO;
             totalAmount = reward.add(tip);
@@ -76,7 +97,7 @@ public class ErrandServiceImpl implements ErrandService {
         // 更新订单状态为已完成
         int updated = errandOrderMapper.updateStatus(orderNo, 4, null);
         if (updated == 0) {
-            throw new IllegalStateException("完成失败");
+            throw new IllegalStateException("更新订单状态失败");
         }
     }
 

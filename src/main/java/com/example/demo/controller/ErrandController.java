@@ -50,6 +50,19 @@ public class ErrandController {
     }
 
     /**
+     * 开始配送
+     * @param orderNo 订单号
+     * @return 操作结果
+     */
+    @Operation(summary = "开始配送", description = "跑腿员开始配送任务")
+    @PostMapping("/start-delivery")
+    public Result<String> startDelivery(
+            @Parameter(description = "订单号", required = true) @RequestParam String orderNo) {
+        errandService.startDelivery(orderNo);
+        return Result.success("已开始配送");
+    }
+
+    /**
      * 完成订单
      * @param orderNo 订单号
      * @return 操作结果

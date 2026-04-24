@@ -22,6 +22,12 @@ public interface ErrandService {
     void takeOrder(String orderNo, Long runnerId);
     
     /**
+     * 开始配送
+     * @param orderNo 订单号
+     */
+    void startDelivery(String orderNo);
+
+    /**
      * 完成订单
      * @param orderNo 订单号
      */
