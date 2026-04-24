@@ -5,6 +5,8 @@ import com.example.demo.pojo.entity.Complaint;
 import com.example.demo.service.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +24,12 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     @Override
     public void resolveComplaint(Long complaintId, String result) {
-        Complaint c = complaintMapper.findById(complaintId);
-        if (c != null) {
-            c.setStatus(2);
-            c.setResult(result);
-            complaintMapper.update(c);
-        }
+        handleComplaint(complaintId, result, 2, "处理");
+    }
+
+    @Override
+    public void rejectComplaint(Long complaintId, String result) {
+        handleComplaint(complaintId, result, 3, "拒绝");
     }
 
     @Override
@@ -43,5 +45,21 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public List<Map<String, Object>> countComplaintsByStatus() {
         return complaintMapper.countByStatus();
+    }
+
+    private void handleComplaint(Long complaintId, String result, Integer targetStatus, String actionName) {
+        Complaint complaint = complaintMapper.findById(complaintId);
+        if (complaint == null) {
+            throw new IllegalArgumentException("投诉不存在");
+        }
+        if (!StringUtils.hasText(result)) {
+            throw new IllegalArgumentException("处理结果不能为空");
+        }
+        if (complaint.getStatus() != null && (complaint.getStatus() == 2 || complaint.getStatus() == 3)) {
+            throw new IllegalStateException("投诉已处理，不能重复" + actionName);
+        }
+        complaint.setStatus(targetStatus);
+        complaint.setResult(result.trim());
+        complaintMapper.update(complaint);
     }
 }

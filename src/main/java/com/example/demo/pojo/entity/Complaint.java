@@ -24,7 +24,7 @@ public class Complaint {
     @Schema(description = "投诉原因/内容")
     private String reason;
     
-    @Schema(description = "状态: 0-待处理, 1-处理中, 2-已完成")
+    @Schema(description = "状态: 0-待处理, 1-处理中, 2-已完成, 3-已拒绝")
     private Integer status; 
     
     @Schema(description = "处理结果")

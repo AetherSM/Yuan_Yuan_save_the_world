@@ -67,6 +67,20 @@ const complete = async (orderNo) => {
   }
 }
 
+const startDelivery = async (orderNo) => {
+  try {
+    const { data } = await http.post('/api/errands/start-delivery', null, { params: { orderNo } })
+    if (data && data.code === 1) {
+      ElMessage.success('已开始配送')
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '操作失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -116,6 +130,9 @@ onMounted(load)
           <div><b>送</b>：{{ item.deliveryAddress }}</div>
         </div>
         <div class="ops">
+          <el-button v-if="item.orderStatus === 2" type="info" @click="startDelivery(item.orderNo)">
+            开始配送
+          </el-button>
           <el-button v-if="item.orderStatus === 2 || item.orderStatus === 3" type="primary" @click="complete(item.orderNo)">
             确认送达
           </el-button>

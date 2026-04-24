@@ -37,7 +37,7 @@
         ) values (
             #{orderNo}, #{userId}, #{errandType}, #{title}, #{description}, #{pickupAddress}, #{deliveryAddress},
             #{contactName}, #{contactPhone}, #{pickupCode}, #{expectedTimeRange}, #{reward}, #{tip}, #{totalAmount},
-            #{images}, #{deadline}, 1, #{remark}, now(), now()
+            #{images}, #{deadline}, #{orderStatus}, #{remark}, now(), now()
         )
     </insert>
 

@@ -73,4 +73,19 @@ public class AdminComplaintController {
         complaintService.resolveComplaint(complaintId, result);
         return Result.success("处理完成");
     }
+
+    /**
+     * 拒绝投诉
+     * @param complaintId 投诉ID
+     * @param result 拒绝说明
+     * @return 操作结果
+     */
+    @Operation(summary = "拒绝投诉", description = "管理员拒绝投诉并给出说明")
+    @PostMapping("/{id}/reject")
+    public Result<String> rejectComplaint(
+            @PathVariable("id") Long complaintId,
+            @Parameter(description = "拒绝说明", required = true) @RequestParam String result) {
+        complaintService.rejectComplaint(complaintId, result);
+        return Result.success("已拒绝投诉");
+    }
 }

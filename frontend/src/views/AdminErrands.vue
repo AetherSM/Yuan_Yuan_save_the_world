@@ -2,8 +2,8 @@
   <div>
     <h1>跑腿任务管理</h1>
     <div class="filters">
-      <el-input v-model="filters.userId" placeholder="用户ID" />
-      <el-input v-model="filters.runnerId" placeholder="跑腿员ID" />
+      <el-input v-model="filters.userQuery" placeholder="用户昵称/手机号" />
+      <el-input v-model="filters.runnerQuery" placeholder="跑腿员昵称/手机号" />
       <el-select v-model="filters.status" placeholder="状态">
         <el-option label="全部" value="" />
         <el-option label="待审核" value="0" />
@@ -19,11 +19,18 @@
     </div>
 
     <el-table :data="errands" style="width: 100%">
-      <el-table-column prop="orderId" label="ID" width="80" />
       <el-table-column prop="orderNo" label="订单编号" />
       <el-table-column prop="title" label="任务标题" />
-      <el-table-column prop="userId" label="用户ID" />
-      <el-table-column prop="runnerId" label="跑腿员ID" />
+      <el-table-column label="用户">
+        <template #default="{ row }">
+          {{ row.user?.nickname }} ({{ row.user?.phone }})
+        </template>
+      </el-table-column>
+      <el-table-column label="跑腿员">
+        <template #default="{ row }">
+          {{ row.runner?.nickname }} ({{ row.runner?.phone }})
+        </template>
+      </el-table-column>
       <el-table-column prop="reward" label="赏金" />
       <el-table-column prop="orderStatus" label="状态">
         <template #default="{ row }">
@@ -58,13 +65,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import http from '../services/http'
+import http, { getUserDetails, searchUserIds } from '../services/http'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const errands = ref([])
 const filters = ref({
-  userId: '',
-  runnerId: '',
+  userQuery: '', // 用于用户昵称/手机号搜索
+  runnerQuery: '', // 用于跑腿员昵称/手机号搜索
   status: '',
 })
 
@@ -93,14 +100,37 @@ const getStatusType = (status) => {
 
 const loadErrands = async () => {
   try {
+    let userIds = null;
+    if (filters.value.userQuery) {
+      userIds = await searchUserIds(filters.value.userQuery);
+      if (userIds.length === 0) { // 如果没有找到用户，则不发送请求
+        errands.value = [];
+        return;
+      }
+    }
+
+    let runnerIds = null;
+    if (filters.value.runnerQuery) {
+      runnerIds = await searchUserIds(filters.value.runnerQuery);
+      if (runnerIds.length === 0) { // 如果没有找到跑腿员，则不发送请求
+        errands.value = [];
+        return;
+      }
+    }
+
     const params = {
-      userId: filters.value.userId || null,
-      runnerId: filters.value.runnerId || null,
+      userId: userIds ? userIds.join(',') : null,
+      runnerId: runnerIds ? runnerIds.join(',') : null,
       status: filters.value.status || null,
     }
     const { data } = await http.get('/admin/errands', { params })
     if (data.code === 1) {
-      errands.value = (data.data || []).map(it => ({ ...it, _nextStatus: it.orderStatus }))
+      const fetchedErrands = await Promise.all((data.data || []).map(async it => {
+        const user = it.userId ? await getUserDetails(it.userId) : null;
+        const runner = it.runnerId ? await getUserDetails(it.runnerId) : null;
+        return { ...it, _nextStatus: it.orderStatus, user, runner };
+      }));
+      errands.value = fetchedErrands;
     } else {
       ElMessage.error(data.msg || '加载任务失败')
     }
@@ -113,7 +143,12 @@ const loadPendingErrands = async () => {
   try {
     const { data } = await http.get('/admin/errands/pending')
     if (data.code === 1) {
-      errands.value = (data.data || []).map(it => ({ ...it, _nextStatus: it.orderStatus }))
+      const fetchedErrands = await Promise.all((data.data || []).map(async it => {
+        const user = it.userId ? await getUserDetails(it.userId) : null;
+        const runner = it.runnerId ? await getUserDetails(it.runnerId) : null;
+        return { ...it, _nextStatus: it.orderStatus, user, runner };
+      }));
+      errands.value = fetchedErrands;
     } else {
       ElMessage.error(data.msg || '加载待审核任务失败')
     }

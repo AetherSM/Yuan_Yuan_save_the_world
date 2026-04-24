@@ -3,7 +3,9 @@
 /Users/develop/final_college/demo/src/main/java/com/example/demo/config/AspectConfig.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/config/MyBatisConfig.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/config/OpenApiConfig.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/config/RedisConfig.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/config/WebConfig.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/config/WebSocketConfig.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/constant/JwtClaimsConstant.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/constant/MessageConstant.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/constant/Messages.java
@@ -19,6 +21,7 @@
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/CartController.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/CategoryController.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/ChatController.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/controller/CommonController.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/ComplaintController.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/CouponController.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/controller/ErrandController.java
@@ -92,6 +95,7 @@
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/entity/WalletTransaction.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/entity/WantedPost.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/result/Result.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/vo/ChatSessionVO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/vo/UserDetailVO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/properties/JwtProperties.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/service/AddressService.java
@@ -133,3 +137,4 @@
 /Users/develop/final_college/demo/src/main/java/com/example/demo/utils/JwtUtil.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/utils/MD5Util.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/utils/MailUtil.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/websocket/WebSocketServer.java

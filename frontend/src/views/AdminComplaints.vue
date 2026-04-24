@@ -7,6 +7,7 @@
         <el-option label="待处理" value="0" />
         <el-option label="处理中" value="1" />
         <el-option label="已完成" value="2" />
+        <el-option label="已拒绝" value="3" />
       </el-select>
       <el-select v-model="filters.orderType" placeholder="订单类型">
         <el-option label="全部" value="" />
@@ -39,7 +40,11 @@
           {{ row.orderType === 1 ? '商品订单' : '跑腿订单' }}
         </template>
       </el-table-column>
-      <el-table-column prop="complainantId" label="投诉人ID" />
+      <el-table-column label="投诉人">
+        <template #default="{ row }">
+          {{ row.complainant?.nickname }} ({{ row.complainant?.phone }})
+        </template>
+      </el-table-column>
       <el-table-column prop="reason" label="投诉原因" />
       <el-table-column prop="status" label="状态">
         <template #default="{ row }">
@@ -51,7 +56,7 @@
       <el-table-column prop="createTime" label="提交时间" />
       <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button size="small" type="primary" @click="handleComplaint(row)" v-if="row.status !== 2">处理</el-button>
+          <el-button size="small" type="primary" @click="handleComplaint(row)" v-if="row.status !== 2 && row.status !== 3">处理</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,8 +77,8 @@
           <el-form-item label="订单类型">
             {{ currentComplaint.orderType === 1 ? '商品订单' : '跑腿订单' }}
           </el-form-item>
-          <el-form-item label="投诉人ID">
-            {{ currentComplaint.complainantId }}
+          <el-form-item label="投诉人">
+            {{ currentComplaint.complainant?.nickname }} ({{ currentComplaint.complainant?.phone }})
           </el-form-item>
           <el-form-item label="投诉原因">
             {{ currentComplaint.reason }}
@@ -91,7 +96,8 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitHandle">提交处理</el-button>
+          <el-button type="danger" @click="submitHandle('reject')">拒绝投诉</el-button>
+          <el-button type="primary" @click="submitHandle('resolve')">处理完成</el-button>
         </span>
       </template>
     </el-dialog>
@@ -100,7 +106,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import http from '../services/http'
+import http, { getUserDetails } from '../services/http'
 import { ElMessage } from 'element-plus'
 
 const complaints = ref([])
@@ -119,6 +125,7 @@ const getStatusText = (status) => {
     case 0: return '待处理'
     case 1: return '处理中'
     case 2: return '已完成'
+    case 3: return '已拒绝'
     default: return '未知'
   }
 }
@@ -128,6 +135,7 @@ const getStatusType = (status) => {
     case 0: return 'warning'
     case 1: return 'info'
     case 2: return 'success'
+    case 3: return 'danger'
     default: return ''
   }
 }
@@ -140,7 +148,11 @@ const loadComplaints = async () => {
     }
     const { data } = await http.get('/admin/complaints', { params })
     if (data.code === 1) {
-      complaints.value = data.data
+      const fetchedComplaints = await Promise.all((data.data || []).map(async it => {
+        const complainant = it.complainantId ? await getUserDetails(it.complainantId) : null;
+        return { ...it, complainant };
+      }));
+      complaints.value = fetchedComplaints;
     } else {
       ElMessage.error(data.msg || '加载投诉失败')
     }
@@ -168,21 +180,23 @@ const handleComplaint = (complaint) => {
   dialogVisible.value = true
 }
 
-const submitHandle = async () => {
+const submitHandle = async (action) => {
   if (!handleResult.value.trim()) {
     ElMessage.warning('请输入处理结果')
     return
   }
   
   try {
-    await http.post(`/admin/complaints/${currentComplaint.value.complaintId}/resolve`, null, {
+    const endpoint = action === 'reject' ? 'reject' : 'resolve'
+    await http.post(`/admin/complaints/${currentComplaint.value.complaintId}/${endpoint}`, null, {
       params: { result: handleResult.value }
     })
-    ElMessage.success('处理成功')
+    ElMessage.success(action === 'reject' ? '已拒绝投诉' : '处理成功')
     dialogVisible.value = false
     await loadComplaints()
+    await loadStats()
   } catch (error) {
-    ElMessage.error('处理失败')
+    ElMessage.error(action === 'reject' ? '拒绝失败' : '处理失败')
   }
 }
 

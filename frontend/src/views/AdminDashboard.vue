@@ -36,7 +36,18 @@
       <el-col :xs="24" :md="12">
         <el-card>
           <template #header>
-            <div class="chart-header">待处理投诉趋势（按日期）</div>
+            <div class="chart-header">
+              <span>待处理投诉趋势（按日期）</span>
+              <el-date-picker
+                v-model="complaintDateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                value-format="YYYY-MM-DD"
+                @change="refresh"
+              />
+            </div>
           </template>
           <div ref="complaintChartEl" class="chart"></div>
         </el-card>
@@ -82,6 +93,7 @@ const pendingProducts = ref(0)
 const pendingErrands = ref(0)
 const pendingComplaints = ref(0)
 const pendingByDate = ref([])
+const complaintDateRange = ref([]) // 用于日期选择器
 
 const go = (path) => router.push(path)
 
@@ -133,10 +145,16 @@ const renderErrandChart = (list) => {
 const refresh = async () => {
   loading.value = true
   try {
+    const complaintParams = { status: 0 };
+    if (complaintDateRange.value && complaintDateRange.value.length === 2) {
+      complaintParams.startTime = complaintDateRange.value[0];
+      complaintParams.endTime = complaintDateRange.value[1];
+    }
+
     const results = await Promise.allSettled([
       http.get('/admin/products/pending'),
       http.get('/admin/errands/pending'),
-      http.get('/admin/complaints', { params: { status: 0 } }),
+      http.get('/admin/complaints', { params: complaintParams }),
       http.get('/admin/complaints/stats'),
       http.get('/admin/errands'),
     ])

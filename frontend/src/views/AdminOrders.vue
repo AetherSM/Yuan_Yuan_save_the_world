@@ -6,8 +6,8 @@
       <el-tab-pane label="商品订单" name="product">
         <div class="filters">
           <el-input v-model="pFilters.orderNo" placeholder="订单号" style="width: 220px" />
-          <el-input v-model="pFilters.userId" placeholder="用户ID" style="width: 140px" />
-          <el-input v-model="pFilters.sellerId" placeholder="商家ID" style="width: 140px" />
+          <el-input v-model="pFilters.userQuery" placeholder="用户昵称/手机号" style="width: 140px" />
+          <el-input v-model="pFilters.sellerQuery" placeholder="商家昵称/手机号" style="width: 140px" />
           <el-select v-model="pFilters.status" placeholder="状态" style="width: 160px" clearable>
             <el-option v-for="(label, key) in productStatusMap" :key="key" :label="label" :value="Number(key)" />
           </el-select>
@@ -17,10 +17,17 @@
         </div>
 
         <el-table :data="productOrders" style="width: 100%">
-          <el-table-column prop="orderId" label="ID" width="80" />
           <el-table-column prop="orderNo" label="订单号" width="170" />
-          <el-table-column prop="userId" label="用户ID" width="90" />
-          <el-table-column prop="sellerId" label="商家ID" width="90" />
+          <el-table-column label="用户" width="150">
+            <template #default="{ row }">
+              {{ row.user?.nickname }} ({{ row.user?.phone }})
+            </template>
+          </el-table-column>
+          <el-table-column label="商家" width="150">
+            <template #default="{ row }">
+              {{ row.seller?.nickname }} ({{ row.seller?.phone }})
+            </template>
+          </el-table-column>
           <el-table-column prop="totalAmount" label="金额" width="110" />
           <el-table-column prop="orderStatus" label="状态" width="110">
             <template #default="{ row }">
@@ -56,8 +63,8 @@
 
       <el-tab-pane label="跑腿订单" name="errand">
         <div class="filters">
-          <el-input v-model="eFilters.userId" placeholder="用户ID" style="width: 140px" />
-          <el-input v-model="eFilters.runnerId" placeholder="跑腿员ID" style="width: 140px" />
+          <el-input v-model="eFilters.userQuery" placeholder="用户昵称/手机号" style="width: 140px" />
+          <el-input v-model="eFilters.runnerQuery" placeholder="跑腿员昵称/手机号" style="width: 140px" />
           <el-select v-model="eFilters.status" placeholder="状态" style="width: 160px" clearable>
             <el-option v-for="(label, key) in errandStatusMap" :key="key" :label="label" :value="Number(key)" />
           </el-select>
@@ -67,11 +74,18 @@
         </div>
 
         <el-table :data="errandOrders" style="width: 100%">
-          <el-table-column prop="orderId" label="ID" width="80" />
           <el-table-column prop="orderNo" label="订单编号" width="160" />
           <el-table-column prop="title" label="标题" min-width="180" />
-          <el-table-column prop="userId" label="用户ID" width="90" />
-          <el-table-column prop="runnerId" label="跑腿员ID" width="90" />
+          <el-table-column label="用户" width="150">
+            <template #default="{ row }">
+              {{ row.user?.nickname }} ({{ row.user?.phone }})
+            </template>
+          </el-table-column>
+          <el-table-column label="跑腿员" width="150">
+            <template #default="{ row }">
+              {{ row.runner?.nickname }} ({{ row.runner?.phone }})
+            </template>
+          </el-table-column>
           <el-table-column prop="reward" label="赏金" width="110" />
           <el-table-column prop="orderStatus" label="状态" width="110">
             <template #default="{ row }">
@@ -110,7 +124,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import http from '../services/http'
+import http, { getUserDetails, searchUserIds } from '../services/http'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as XLSX from 'xlsx'
 
@@ -119,8 +133,8 @@ const activeTab = ref('product')
 const productOrders = ref([])
 const errandOrders = ref([])
 
-const pFilters = ref({ orderNo: '', userId: '', sellerId: '', status: undefined })
-const eFilters = ref({ userId: '', runnerId: '', status: undefined })
+const pFilters = ref({ orderNo: '', userQuery: '', sellerQuery: '', status: undefined })
+const eFilters = ref({ userQuery: '', runnerQuery: '', status: undefined })
 
 const productStatusMap = {
   1: '待支付',
@@ -160,15 +174,38 @@ const errandStatusTagType = (s) => {
 
 const loadProductOrders = async () => {
   try {
+    let userIds = null;
+    if (pFilters.value.userQuery) {
+      userIds = await searchUserIds(pFilters.value.userQuery);
+      if (userIds.length === 0) {
+        productOrders.value = [];
+        return;
+      }
+    }
+
+    let sellerIds = null;
+    if (pFilters.value.sellerQuery) {
+      sellerIds = await searchUserIds(pFilters.value.sellerQuery);
+      if (sellerIds.length === 0) {
+        productOrders.value = [];
+        return;
+      }
+    }
+
     const params = {
       orderNo: pFilters.value.orderNo || null,
-      userId: pFilters.value.userId ? Number(pFilters.value.userId) : null,
-      sellerId: pFilters.value.sellerId ? Number(pFilters.value.sellerId) : null,
+      userId: userIds ? userIds.join(',') : null,
+      sellerId: sellerIds ? sellerIds.join(',') : null,
       status: pFilters.value.status ?? null,
     }
     const { data } = await http.get('/admin/orders/products', { params })
     if (data.code === 1) {
-      productOrders.value = (data.data || []).map(it => ({ ...it, _nextStatus: it.orderStatus }))
+      const fetchedOrders = await Promise.all((data.data || []).map(async it => {
+        const user = it.userId ? await getUserDetails(it.userId) : null;
+        const seller = it.sellerId ? await getUserDetails(it.sellerId) : null;
+        return { ...it, _nextStatus: it.orderStatus, user, seller };
+      }));
+      productOrders.value = fetchedOrders;
     } else {
       ElMessage.error(data.msg || '加载订单失败')
     }
@@ -179,14 +216,37 @@ const loadProductOrders = async () => {
 
 const loadErrandOrders = async () => {
   try {
+    let userIds = null;
+    if (eFilters.value.userQuery) {
+      userIds = await searchUserIds(eFilters.value.userQuery);
+      if (userIds.length === 0) {
+        errandOrders.value = [];
+        return;
+      }
+    }
+
+    let runnerIds = null;
+    if (eFilters.value.runnerQuery) {
+      runnerIds = await searchUserIds(eFilters.value.runnerQuery);
+      if (runnerIds.length === 0) {
+        errandOrders.value = [];
+        return;
+      }
+    }
+
     const params = {
-      userId: eFilters.value.userId ? Number(eFilters.value.userId) : null,
-      runnerId: eFilters.value.runnerId ? Number(eFilters.value.runnerId) : null,
+      userId: userIds ? userIds.join(',') : null,
+      runnerId: runnerIds ? runnerIds.join(',') : null,
       status: eFilters.value.status ?? null,
     }
     const { data } = await http.get('/admin/errands', { params })
     if (data.code === 1) {
-      errandOrders.value = (data.data || []).map(it => ({ ...it, _nextStatus: it.orderStatus }))
+      const fetchedErrands = await Promise.all((data.data || []).map(async it => {
+        const user = it.userId ? await getUserDetails(it.userId) : null;
+        const runner = it.runnerId ? await getUserDetails(it.runnerId) : null;
+        return { ...it, _nextStatus: it.orderStatus, user, runner };
+      }));
+      errandOrders.value = fetchedErrands;
     } else {
       ElMessage.error(data.msg || '加载订单失败')
     }

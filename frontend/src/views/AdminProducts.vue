@@ -3,7 +3,7 @@
     <h1>商品管理</h1>
     <div class="filters">
       <el-input v-model="filters.keyword" placeholder="商品名称" />
-      <el-input v-model="filters.sellerId" placeholder="商家ID" />
+      <el-input v-model="filters.sellerQuery" placeholder="商家昵称/手机号" />
       <el-select v-model="filters.status" placeholder="状态" clearable>
         <el-option label="上架" :value="1" />
         <el-option label="下架" :value="0" />
@@ -17,7 +17,11 @@
     <el-table :data="products" style="width: 100%">
       <el-table-column prop="productId" label="ID" width="80" />
       <el-table-column prop="productName" label="商品名称" />
-      <el-table-column prop="sellerId" label="商家ID" />
+      <el-table-column label="商家">
+        <template #default="{ row }">
+          {{ row.seller?.nickname }} ({{ row.seller?.phone }})
+        </template>
+      </el-table-column>
       <el-table-column prop="price" label="价格" />
       <el-table-column prop="stock" label="库存" />
       <el-table-column prop="status" label="状态">
@@ -41,13 +45,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import http from '../services/http'
+import http, { getUserDetails, searchUserIds } from '../services/http'
 import { ElMessage } from 'element-plus'
 
 const products = ref([])
 const filters = ref({
   keyword: '',
-  sellerId: '',
+  sellerQuery: '', // 用于商家昵称/手机号搜索
   status: undefined,
 })
 
@@ -60,14 +64,27 @@ const statusMap = {
 
 const loadProducts = async () => {
   try {
+    let sellerIds = null;
+    if (filters.value.sellerQuery) {
+      sellerIds = await searchUserIds(filters.value.sellerQuery);
+      if (sellerIds.length === 0) { // 如果没有找到商家，则不发送请求
+        products.value = [];
+        return;
+      }
+    }
+
     const params = {
       keyword: filters.value.keyword || null,
-      sellerId: filters.value.sellerId || null,
+      sellerId: sellerIds ? sellerIds.join(',') : null,
       status: filters.value.status ?? null,
     }
     const { data } = await http.get('/admin/products', { params })
     if (data.code === 1) {
-      products.value = data.data
+      const fetchedProducts = await Promise.all((data.data || []).map(async it => {
+        const seller = it.sellerId ? await getUserDetails(it.sellerId) : null;
+        return { ...it, seller };
+      }));
+      products.value = fetchedProducts;
     } else {
       ElMessage.error(data.msg || '加载商品失败')
     }

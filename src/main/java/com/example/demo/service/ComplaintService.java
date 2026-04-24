@@ -21,6 +21,13 @@ public interface ComplaintService {
      * @param result 处理结果
      */
     void resolveComplaint(Long complaintId, String result);
+
+    /**
+     * 拒绝投诉
+     * @param complaintId 投诉ID
+     * @param result 拒绝说明
+     */
+    void rejectComplaint(Long complaintId, String result);
     
     /**
      * 查询我的投诉

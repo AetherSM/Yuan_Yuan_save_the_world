@@ -30,6 +30,7 @@ const getStatusText = (status) => {
     case 0: return '待处理'
     case 1: return '处理中'
     case 2: return '已完成'
+    case 3: return '已拒绝'
     default: return '未知'
   }
 }
@@ -39,6 +40,7 @@ const getStatusType = (status) => {
     case 0: return 'warning'
     case 1: return 'info'
     case 2: return 'success'
+    case 3: return 'danger'
     default: return ''
   }
 }
