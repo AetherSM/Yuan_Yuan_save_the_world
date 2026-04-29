@@ -23,11 +23,17 @@ public class AdminController {
     @GetMapping
     @Operation(summary = "搜索用户", description = "根据条件搜索用户列表")
     public Result<List<UserEntity>> searchUsers(
+            @Parameter(description = "关键字（手机号/昵称模糊查询，优先使用该参数）") @RequestParam(required = false) String keyword,
             @Parameter(description = "手机号") @RequestParam(required = false) String phone,
             @Parameter(description = "昵称") @RequestParam(required = false) String nickname,
             @Parameter(description = "用户类型") @RequestParam(required = false) Integer userType,
             @Parameter(description = "状态") @RequestParam(required = false) Integer status) {
-        List<UserEntity> users = userService.searchUsers(phone, nickname, userType, status);
+        List<UserEntity> users;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            users = userService.searchUsersByKeyword(keyword.trim(), userType, status);
+        } else {
+            users = userService.searchUsers(phone, nickname, userType, status);
+        }
         return Result.success(users);
     }
 

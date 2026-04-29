@@ -5,6 +5,7 @@ import com.example.demo.pojo.entity.OrderItem;
 import com.example.demo.pojo.entity.ProductOrder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品订单业务接口
@@ -18,6 +19,22 @@ public interface OrderService {
      * @return 创建后的订单
      */
     ProductOrder createOrder(Long userId, OrderCreateDTO dto);
+
+    /**
+     * 下单金额预览（含优惠券试算）
+     * @param userId 用户ID
+     * @param dto 下单信息
+     * @return 金额明细
+     */
+    Map<String, Object> previewOrder(Long userId, OrderCreateDTO dto);
+
+    /**
+     * 查询当前下单可用优惠券
+     * @param userId 用户ID
+     * @param dto 下单信息
+     * @return 优惠券列表
+     */
+    List<Map<String, Object>> listAvailableCouponsForOrder(Long userId, OrderCreateDTO dto);
 
     /**
      * 支付订单

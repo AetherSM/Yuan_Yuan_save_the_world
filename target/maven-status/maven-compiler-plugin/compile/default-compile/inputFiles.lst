@@ -65,6 +65,7 @@
 /Users/develop/final_college/demo/src/main/java/com/example/demo/mapper/WantedPostMapper.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/AddressDTO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/CategoryDTO.java
+/Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/CouponDistributeDTO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/LoginDTO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/LoginResponseDTO.java
 /Users/develop/final_college/demo/src/main/java/com/example/demo/pojo/dto/NoticeDTO.java

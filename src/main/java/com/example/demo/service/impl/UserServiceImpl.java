@@ -222,6 +222,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserEntity> searchUsersByKeyword(String keyword, Integer userType, Integer status) {
+        return userMapper.searchByKeyword(keyword, userType, status);
+    }
+
+    @Override
     public void updateUserStatus(Long userId, Integer status) {
         userMapper.updateStatus(userId, status);
     }

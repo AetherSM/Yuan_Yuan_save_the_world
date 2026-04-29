@@ -315,6 +315,8 @@ create table coupons
     start_time  timestamp                           null comment '有效期开始',
     end_time    timestamp                           null comment '有效期结束',
     status      tinyint        default 1            null comment '状态:0-无效,1-有效',
+    issuer_type tinyint        default 0            null comment '发券方类型:0-管理员,1-商家',
+    issuer_id   bigint                              null comment '发券方ID(管理员ID或商家ID)',
     create_time timestamp      default CURRENT_TIMESTAMP null,
     update_time timestamp      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 )
@@ -465,4 +467,3 @@ create table refund_requests
 create index idx_refund_order on refund_requests (order_type, order_id);
 create index idx_refund_applicant on refund_requests (applicant_id);
 create index idx_refund_status on refund_requests (status);
-

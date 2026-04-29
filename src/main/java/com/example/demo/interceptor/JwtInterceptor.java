@@ -30,6 +30,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private UserService userService;
 
+    /*在controller执行之前进行拦截*/
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         /*获取到当前线程的id*/

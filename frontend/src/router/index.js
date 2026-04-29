@@ -27,6 +27,7 @@ import AdminDashboard from '../views/AdminDashboard.vue'
 import AdminOrders from '../views/AdminOrders.vue'
 import AdminRoleApplications from '../views/AdminRoleApplications.vue'
 import AdminRefunds from '../views/AdminRefunds.vue'
+import AdminCoupons from '../views/AdminCoupons.vue'
 
 const routes = [
   { path: '/', redirect: '/shop' },
@@ -63,6 +64,7 @@ const routes = [
       { path: 'notices', component: AdminNotices },
       { path: 'products', component: AdminProducts },
       { path: 'orders', component: AdminOrders },
+      { path: 'coupons', component: AdminCoupons },
       { path: 'role-applications', component: AdminRoleApplications },
       { path: 'errands', component: AdminErrands },
       { path: 'complaints', component: AdminComplaints },
@@ -76,7 +78,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('token')
   const userType = Number(localStorage.getItem('userType') || 1)
   

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import http from '../services/http'
 import { ElMessage, ElInputNumber, ElRate, ElDialog, ElScrollbar } from 'element-plus'
@@ -15,6 +15,10 @@ const chooseVisible = ref(false)
 const addressId = ref(null)
 const creatingAddress = ref(false)
 const newAddress = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '' })
+const availableCoupons = ref([])
+const selectedCouponId = ref(null)
+const pendingCouponId = ref(null)
+const amountPreview = ref({ originalAmount: 0, discountAmount: 0, payAmount: 0 })
 const reviews = ref([])
 const replies = ref(new Map())
 const replyContent = ref(new Map())
@@ -156,8 +160,46 @@ const openBuy = async () => {
       addressId.value = addresses.value[0]?.addressId || null
       chooseVisible.value = true
       creatingAddress.value = addresses.value.length === 0
+      await loadAvailableCoupons()
+      pendingCouponId.value = selectedCouponId.value
+      await refreshAmountPreview()
     }
   } catch (e) {}
+}
+
+const buildOrderItems = () => [{ productId: id, quantity: qty.value }]
+
+const refreshAmountPreview = async () => {
+  try {
+    const dto = { items: buildOrderItems(), couponId: selectedCouponId.value || null }
+    const { data } = await http.post('/orders/preview', dto)
+    if (data && data.code === 1 && data.data) {
+      amountPreview.value = data.data
+    }
+  } catch (e) {}
+}
+
+const loadAvailableCoupons = async () => {
+  availableCoupons.value = []
+  selectedCouponId.value = null
+  pendingCouponId.value = null
+  try {
+    const { data } = await http.post('/orders/coupons/available', { items: buildOrderItems() })
+    if (data && data.code === 1) {
+      availableCoupons.value = data.data || []
+    }
+  } catch (e) {}
+}
+
+const applySelectedCoupon = async () => {
+  selectedCouponId.value = pendingCouponId.value || null
+  await refreshAmountPreview()
+}
+
+const couponLabel = (c) => {
+  const typeText = c.type === 1 ? `满减${c.value}` : `${c.value}折`
+  const discount = c.discountAmount ?? 0
+  return `${c.name}（${typeText}，可减¥${discount}）`
 }
 const saveNewAddress = async () => {
   if (!newAddress.value.contactName || !newAddress.value.contactPhone || !newAddress.value.address) {
@@ -191,6 +233,7 @@ const payNow = async () => {
     const dto = {
       addressId: addressId.value,
       items: [{ productId: id, quantity: qty.value }],
+      couponId: selectedCouponId.value || null,
       remark: ''
     }
     const { data } = await http.post('/orders', dto)
@@ -231,6 +274,12 @@ const submitReply = async (reviewId) => {
     }
   } catch (e) { ElMessage.error('请求失败') }
 }
+
+watch(qty, async () => {
+  if (!chooseVisible.value) return
+  await loadAvailableCoupons()
+  await refreshAmountPreview()
+})
 </script>
 
 <template>
@@ -318,6 +367,30 @@ const submitReply = async (reviewId) => {
         </div>
       </div>
     </div>
+    <div class="coupon-box">
+      <div class="coupon-title">优惠券</div>
+      <el-select
+        v-model="pendingCouponId"
+        clearable
+        placeholder="不使用优惠券"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="c in availableCoupons"
+          :key="c.userCouponId || c.couponId"
+          :label="couponLabel(c)"
+          :value="c.couponId"
+        />
+      </el-select>
+      <div class="coupon-actions">
+        <el-button size="small" type="primary" @click="applySelectedCoupon">确定使用</el-button>
+      </div>
+    </div>
+    <div class="amount-box">
+      <div>商品金额：¥{{ Number(amountPreview.originalAmount || (Number(product?.price || 0) * Number(qty || 0))).toFixed(2) }}</div>
+      <div>优惠金额：-¥{{ Number(amountPreview.discountAmount || 0).toFixed(2) }}</div>
+      <div class="pay-amount">应付金额：¥{{ Number(amountPreview.payAmount || (Number(product?.price || 0) * Number(qty || 0))).toFixed(2) }}</div>
+    </div>
     <template #footer>
       <div class="dialog-footer">
         <button class="btn" @click="payNow">支付</button>
@@ -386,6 +459,11 @@ const submitReply = async (reviewId) => {
 .new-addr-header{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#374151}
 .new-addr-form{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .new-addr-actions{display:flex;justify-content:flex-end;margin-top:4px}
+.coupon-box{margin-top:10px;border-top:1px dashed #e5e7eb;padding-top:10px}
+.coupon-title{font-size:14px;color:#374151;margin-bottom:6px}
+.coupon-actions{margin-top:8px;display:flex;justify-content:flex-end}
+.amount-box{margin-top:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px;color:#4b5563;display:flex;flex-direction:column;gap:4px}
+.pay-amount{color:#ef4444;font-weight:700}
 .reviews{margin-top:16px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
 .rv-title{font-weight:700;margin-bottom:8px}
 .rv-card{border-top:1px solid #f3f4f6;padding:10px 0}

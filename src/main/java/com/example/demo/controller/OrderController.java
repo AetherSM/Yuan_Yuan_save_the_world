@@ -42,6 +42,20 @@ public class OrderController {
         return Result.success(orderService.createOrder(userId, dto));
     }
 
+    @PostMapping("/preview")
+    @Operation(summary = "预览下单金额", description = "预览订单原价、优惠金额与应付金额")
+    public Result<Map<String, Object>> preview(@RequestBody OrderCreateDTO dto) {
+        Long userId = requireLogin();
+        return Result.success(orderService.previewOrder(userId, dto));
+    }
+
+    @PostMapping("/coupons/available")
+    @Operation(summary = "查询下单可用优惠券", description = "按当前待下单商品计算可用优惠券列表")
+    public Result<List<Map<String, Object>>> listAvailableCoupons(@RequestBody OrderCreateDTO dto) {
+        Long userId = requireLogin();
+        return Result.success(orderService.listAvailableCouponsForOrder(userId, dto));
+    }
+
     /**
      * 支付订单
      * @param orderNo 订单号

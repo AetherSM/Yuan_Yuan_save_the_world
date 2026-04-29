@@ -36,6 +36,8 @@ public interface UserMapper {
 
     List<UserEntity> search(String phone, String nickname, Integer userType, Integer status);
 
+    List<UserEntity> searchByKeyword(String keyword, Integer userType, Integer status);
+
     void updateStatus(Long userId, Integer status);
 
     void updateUserType(Long userId, Integer userType);

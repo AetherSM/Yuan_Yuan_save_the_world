@@ -12,19 +12,22 @@
         <result column="start_time" property="startTime"/>
         <result column="end_time" property="endTime"/>
         <result column="status" property="status"/>
+        <result column="issuer_type" property="issuerType"/>
+        <result column="issuer_id" property="issuerId"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="couponId">
-        insert into coupons(name, type, value, min_spend, total_count, received_count, start_time, end_time, status, create_time, update_time)
-        values(#{name}, #{type}, #{value}, #{minSpend}, #{totalCount}, #{receivedCount}, #{startTime}, #{endTime}, #{status}, now(), now())
+        insert into coupons(name, type, value, min_spend, total_count, received_count, start_time, end_time, status, issuer_type, issuer_id, create_time, update_time)
+        values(#{name}, #{type}, #{value}, #{minSpend}, #{totalCount}, #{receivedCount}, #{startTime}, #{endTime}, #{status}, #{issuerType}, #{issuerId}, now(), now())
     </insert>
 
     <update id="update">
         update coupons set name=#{name}, type=#{type}, value=#{value}, min_spend=#{minSpend}, 
         total_count=#{totalCount}, received_count=#{receivedCount},
-        start_time=#{startTime}, end_time=#{endTime}, status=#{status}, update_time=now()
+        start_time=#{startTime}, end_time=#{endTime}, status=#{status},
+        issuer_type=#{issuerType}, issuer_id=#{issuerId}, update_time=now()
         where coupon_id=#{couponId}
     </update>
 
@@ -38,6 +41,18 @@
           and (start_time is null or start_time &lt;= now())
           and (end_time is null or end_time &gt;= now())
           and (total_count is null or total_count = 0 or received_count  &lt; total_count)
+    </select>
+
+    <select id="findByIssuer" resultMap="BaseResultMap">
+        select * from coupons
+        where issuer_type = #{issuerType}
+          and issuer_id = #{issuerId}
+        order by create_time desc
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from coupons
+        order by create_time desc
     </select>
     
     <update id="incrementReceiveCount">

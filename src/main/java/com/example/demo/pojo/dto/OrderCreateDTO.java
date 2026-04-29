@@ -18,7 +18,8 @@ public class OrderCreateDTO {
     private String contactPhone;
     @Schema(description = "备注")
     private String remark;
+    @Schema(description = "用户优惠券ID")
+    private Long couponId;
     @Schema(description = "订单商品项列表")
     private List<OrderItemDTO> items;
 }
-

@@ -8,6 +8,7 @@
         <router-link to="/admin/users" class="menu-item">用户管理</router-link>
         <router-link to="/admin/products" class="menu-item">商品管理</router-link>
         <router-link to="/admin/orders" class="menu-item">订单管理</router-link>
+        <router-link to="/admin/coupons" class="menu-item">优惠券管理</router-link>
         <router-link to="/admin/refunds" class="menu-item">退款管理</router-link>
         <router-link to="/admin/errands" class="menu-item">跑腿任务管理</router-link>
         <router-link to="/admin/complaints" class="menu-item">投诉管理</router-link>
@@ -47,6 +48,7 @@ const pageTitle = computed(() => {
   if (p.startsWith('/admin/users')) return '用户管理'
   if (p.startsWith('/admin/products')) return '商品管理'
   if (p.startsWith('/admin/orders')) return '订单管理'
+  if (p.startsWith('/admin/coupons')) return '优惠券管理'
   if (p.startsWith('/admin/refunds')) return '退款管理'
   if (p.startsWith('/admin/errands')) return '跑腿任务管理'
   if (p.startsWith('/admin/complaints')) return '投诉管理'

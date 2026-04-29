@@ -44,6 +44,11 @@ public interface UserService {
 
     List<UserEntity> searchUsers(String phone, String nickname, Integer userType, Integer status);
 
+    /**
+     * 关键字模糊搜索（手机号/昵称）
+     */
+    List<UserEntity> searchUsersByKeyword(String keyword, Integer userType, Integer status);
+
     void updateUserStatus(Long userId, Integer status);
 
     void updateUserType(Long userId, Integer userType);

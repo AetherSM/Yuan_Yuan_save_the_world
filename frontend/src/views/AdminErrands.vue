@@ -39,24 +39,28 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="强制改状态" width="200">
+      <el-table-column label="强制改状态" width="230">
         <template #default="{ row }">
-          <el-select
-            v-model="row._nextStatus"
-            placeholder="选择状态"
-            size="small"
-            style="width: 120px"
-          >
-            <el-option v-for="(label, key) in statusMap" :key="key" :label="label" :value="Number(key)" />
-          </el-select>
-          <el-button size="small" type="primary" @click="forceUpdateStatus(row)" style="margin-left: 8px">更新</el-button>
+          <div class="status-actions">
+            <el-select
+              v-model="row._nextStatus"
+              placeholder="选择状态"
+              size="small"
+              style="width: 130px"
+            >
+              <el-option v-for="(label, key) in statusMap" :key="key" :label="label" :value="Number(key)" />
+            </el-select>
+            <el-button size="small" type="primary" @click="forceUpdateStatus(row)">更新</el-button>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="250">
         <template #default="{ row }">
-          <el-button size="small" type="success" @click="approveErrand(row)" v-if="row.orderStatus === 0">审核通过</el-button>
-          <el-button size="small" type="danger" @click="rejectErrand(row)" v-if="row.orderStatus === 0">审核拒绝</el-button>
-          <el-button size="small" type="danger" plain @click="forceCancel(row)" v-if="row.orderStatus !== 5 && row.orderStatus !== 4">强制取消</el-button>
+          <div class="row-actions">
+            <el-button size="small" type="success" @click="approveErrand(row)" v-if="row.orderStatus === 0">审核通过</el-button>
+            <el-button size="small" type="danger" @click="rejectErrand(row)" v-if="row.orderStatus === 0">审核拒绝</el-button>
+            <el-button size="small" type="danger" plain @click="forceCancel(row)" v-if="row.orderStatus !== 5 && row.orderStatus !== 4">强制取消</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -215,6 +219,20 @@ onMounted(loadErrands)
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
 }
 </style>

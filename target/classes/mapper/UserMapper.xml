@@ -89,6 +89,25 @@
         order by create_time desc
     </select>
 
+    <select id="searchByKeyword" resultMap="BaseResultMap">
+        select * from users
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    phone like concat('%', #{keyword}, '%')
+                    or nickname like concat('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="userType != null">
+                and user_type = #{userType}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
     <update id="updateStatus">
         update users set status = #{status}, update_time = now() where user_id = #{userId}
     </update>

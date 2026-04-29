@@ -41,6 +41,12 @@ public class Coupon {
     
     @Schema(description = "状态: 0-无效, 1-有效")
     private Integer status; 
+
+    @Schema(description = "发券方类型: 0-管理员, 1-商家")
+    private Integer issuerType;
+
+    @Schema(description = "发券方ID(管理员ID或商家ID)")
+    private Long issuerId;
     
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -10,6 +10,10 @@ const addressId = ref(null)
 const checkoutVisible = ref(false)
 const creatingAddress = ref(false)
 const newAddress = ref({ contactName: '', contactPhone: '', address: '', building: '', room: '' })
+const availableCoupons = ref([])
+const selectedCouponId = ref(null)
+const pendingCouponId = ref(null)
+const amountPreview = ref({ originalAmount: 0, discountAmount: 0, payAmount: 0 })
 const loading = ref(false)
 const error = ref('')
 
@@ -55,8 +59,55 @@ const openCheckout = async () => {
       addressId.value = addresses.value[0]?.addressId || null
       checkoutVisible.value = true
       creatingAddress.value = addresses.value.length === 0
+      await loadAvailableCoupons()
+      pendingCouponId.value = selectedCouponId.value
+      await refreshAmountPreview()
     }
   } catch (e) {}
+}
+const buildOrderItems = () =>
+  items.value
+    .map(x => ({ productId: x.product?.productId, quantity: x.cartItem?.quantity || 1 }))
+    .filter(x => x.productId)
+
+const refreshAmountPreview = async () => {
+  const payloadItems = buildOrderItems()
+  if (!payloadItems.length) {
+    amountPreview.value = { originalAmount: 0, discountAmount: 0, payAmount: 0 }
+    return
+  }
+  try {
+    const dto = { items: payloadItems, couponId: selectedCouponId.value || null }
+    const { data } = await http.post('/orders/preview', dto)
+    if (data && data.code === 1 && data.data) {
+      amountPreview.value = data.data
+    }
+  } catch (e) {}
+}
+
+const loadAvailableCoupons = async () => {
+  const payloadItems = buildOrderItems()
+  availableCoupons.value = []
+  selectedCouponId.value = null
+  pendingCouponId.value = null
+  if (!payloadItems.length) return
+  try {
+    const { data } = await http.post('/orders/coupons/available', { items: payloadItems })
+    if (data && data.code === 1) {
+      availableCoupons.value = data.data || []
+    }
+  } catch (e) {}
+}
+
+const applySelectedCoupon = async () => {
+  selectedCouponId.value = pendingCouponId.value || null
+  await refreshAmountPreview()
+}
+
+const couponLabel = (c) => {
+  const typeText = c.type === 1 ? `满减${c.value}` : `${c.value}折`
+  const discount = c.discountAmount ?? 0
+  return `${c.name}（${typeText}，可减¥${discount}）`
 }
 const saveNewAddress = async () => {
   if (!newAddress.value.contactName || !newAddress.value.contactPhone || !newAddress.value.address) {
@@ -87,8 +138,8 @@ const saveNewAddress = async () => {
 const checkout = async () => {
   if (!addressId.value) { ElMessage.error('请选择地址'); return }
   try {
-    const payloadItems = items.value.map(x => ({ productId: x.product?.productId, quantity: x.cartItem?.quantity || 1 })).filter(x => x.productId)
-    const dto = { addressId: addressId.value, items: payloadItems }
+    const payloadItems = buildOrderItems()
+    const dto = { addressId: addressId.value, items: payloadItems, couponId: selectedCouponId.value || null }
     const { data } = await http.post('/orders', dto)
     if (data && data.code === 1 && data.data?.orderNo) {
       const orderNo = data.data.orderNo
@@ -126,6 +177,7 @@ const total = () => items.value.reduce((sum, x) => {
   const qty = x.cartItem?.quantity || 0
   return sum + Number(price) * qty
 }, 0)
+
 </script>
 
 <template>
@@ -204,6 +256,30 @@ const total = () => items.value.reduce((sum, x) => {
           </div>
         </div>
       </div>
+      <div class="coupon-box">
+        <div class="coupon-title">优惠券</div>
+        <el-select
+          v-model="pendingCouponId"
+          clearable
+          placeholder="不使用优惠券"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="c in availableCoupons"
+            :key="c.userCouponId || c.couponId"
+            :label="couponLabel(c)"
+            :value="c.couponId"
+          />
+        </el-select>
+        <div class="coupon-actions">
+          <el-button size="small" type="primary" @click="applySelectedCoupon">确定使用</el-button>
+        </div>
+      </div>
+      <div class="amount-box">
+        <div>商品金额：¥{{ Number(amountPreview.originalAmount || total()).toFixed(2) }}</div>
+        <div>优惠金额：-¥{{ Number(amountPreview.discountAmount || 0).toFixed(2) }}</div>
+        <div class="pay-amount">应付金额：¥{{ Number(amountPreview.payAmount || total()).toFixed(2) }}</div>
+      </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="checkout">支付</el-button>
@@ -230,4 +306,9 @@ const total = () => items.value.reduce((sum, x) => {
 .new-addr-header{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#374151}
 .new-addr-form{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .new-addr-actions{display:flex;justify-content:flex-end;margin-top:4px}
+.coupon-box{margin-top:10px;border-top:1px dashed #e5e7eb;padding-top:10px}
+.coupon-title{font-size:14px;color:#374151;margin-bottom:6px}
+.coupon-actions{margin-top:8px;display:flex;justify-content:flex-end}
+.amount-box{margin-top:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px;color:#4b5563;display:flex;flex-direction:column;gap:4px}
+.pay-amount{color:#ef4444;font-weight:700}
 </style>
