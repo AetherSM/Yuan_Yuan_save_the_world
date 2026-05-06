@@ -19,6 +19,7 @@
         <result column="confirm_time" property="confirmTime"/>
         <result column="cancel_reason" property="cancelReason"/>
         <result column="remark" property="remark"/>
+        <result column="hidden_from_buyer" property="hiddenFromBuyer"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="item_summary" property="itemSummary"/>
@@ -27,10 +28,10 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="orderId" keyColumn="order_id">
         insert into product_orders(
             order_no, user_id, seller_id, total_amount, delivery_address,
-            contact_name, contact_phone, order_status, remark, create_time, update_time
+            contact_name, contact_phone, order_status, remark, hidden_from_buyer, create_time, update_time
         ) values(
             #{orderNo}, #{userId}, #{sellerId}, #{totalAmount}, #{deliveryAddress},
-            #{contactName}, #{contactPhone}, #{orderStatus}, #{remark}, now(), now()
+            #{contactName}, #{contactPhone}, #{orderStatus}, #{remark}, 0, now(), now()
         )
     </insert>
 
@@ -93,6 +94,7 @@
         select * from product_orders
         <where>
             user_id = #{userId}
+            and (hidden_from_buyer = 0 or hidden_from_buyer is null)
             <if test="status != null"> and order_status = #{status} </if>
         </where>
         order by create_time desc
@@ -105,11 +107,34 @@
         left join order_items oi on p.order_id = oi.order_id
         <where>
             p.user_id = #{userId}
+            and (p.hidden_from_buyer = 0 or p.hidden_from_buyer is null)
             <if test="status != null"> and p.order_status = #{status} </if>
         </where>
         group by p.order_id
         order by p.create_time desc
     </select>
+
+    <update id="hideFromBuyer">
+        update product_orders
+        set hidden_from_buyer = 1,
+            update_time = now()
+        where order_no = #{orderNo}
+          and user_id = #{userId}
+          and (hidden_from_buyer = 0 or hidden_from_buyer is null)
+    </update>
+
+    <update id="batchHideFromBuyer">
+        update product_orders
+        set hidden_from_buyer = 1,
+            update_time = now()
+        where user_id = #{userId}
+          and order_no in
+          <foreach collection="orderNos" item="orderNo" open="(" separator="," close=")">
+              #{orderNo}
+          </foreach>
+          and (hidden_from_buyer = 0 or hidden_from_buyer is null)
+          and order_status in (4, 5, 6, 7)
+    </update>
 
     <select id="listBySeller" resultMap="BaseResultMap">
         select * from product_orders

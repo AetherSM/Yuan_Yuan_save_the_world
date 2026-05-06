@@ -25,6 +25,7 @@
         <result column="order_status" property="orderStatus"/>
         <result column="cancel_reason" property="cancelReason"/>
         <result column="remark" property="remark"/>
+        <result column="hidden_from_user" property="hiddenFromUser"/>
         <result column="accepted_at" property="acceptedAt"/>
         <result column="completed_at" property="completedAt"/>
         <result column="create_time" property="createTime"/>
@@ -88,6 +89,7 @@
         left join users u on e.runner_id = u.user_id
         <where>
             e.user_id = #{userId}
+            and (e.hidden_from_user = 0 or e.hidden_from_user is null)
             <choose>
                 <when test="status != null and status == -1">
                     and e.order_status in (0, 1, 2, 3, 7)
@@ -125,5 +127,27 @@
         set order_status = #{status},
             update_time = now()
         where order_id = #{orderId}
+    </update>
+
+    <update id="hideFromUser">
+        update errand_orders
+        set hidden_from_user = 1,
+            update_time = now()
+        where order_no = #{orderNo}
+          and user_id = #{userId}
+          and (hidden_from_user = 0 or hidden_from_user is null)
+    </update>
+
+    <update id="batchHideFromUser">
+        update errand_orders
+        set hidden_from_user = 1,
+            update_time = now()
+        where user_id = #{userId}
+          and order_no in
+          <foreach collection="orderNos" item="orderNo" open="(" separator="," close=")">
+              #{orderNo}
+          </foreach>
+          and (hidden_from_user = 0 or hidden_from_user is null)
+          and order_status in (4, 5, 6, 8)
     </update>
 </mapper>

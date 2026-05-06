@@ -81,6 +81,16 @@ public interface OrderService {
     List<ProductOrder> listUserOrders(Long userId, Integer status);
 
     /**
+     * 买家从「我的订单」中移除记录（仅隐藏买家列表，订单与商家侧数据保留）
+     */
+    void hideOrderFromBuyerList(String orderNo, Long userId);
+
+    /**
+     * 批量隐藏
+     */
+    void batchHideOrdersFromBuyerList(List<String> orderNos, Long userId);
+
+    /**
      * 查询卖家订单列表
      * @param sellerId 卖家ID
      * @param status 订单状态 (可选)

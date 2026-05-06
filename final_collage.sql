@@ -125,7 +125,8 @@ create table product_orders
     ship_time        timestamp                           null comment '发货时间',
     confirm_time     timestamp                           null comment '确认收货时间',
     cancel_reason    varchar(255)                        null comment '取消原因',
-    remark           varchar(255)                        null comment '买家备注',
+    remark             varchar(255)                        null comment '买家备注',
+    hidden_from_buyer tinyint   default 0                 not null comment '买家是否已从我的订单移除:0否1是(软删，商家侧仍可见)',
     create_time      timestamp default CURRENT_TIMESTAMP null,
     update_time      timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     constraint order_no

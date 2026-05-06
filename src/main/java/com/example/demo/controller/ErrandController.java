@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.context.BaseContext;
 import com.example.demo.pojo.entity.ErrandOrder;
 import com.example.demo.pojo.result.Result;
 import com.example.demo.service.ErrandService;
@@ -108,5 +109,27 @@ public class ErrandController {
     public Result<List<ErrandOrder>> listRunnerOrders(
             @Parameter(description = "跑腿员ID", required = true) @RequestParam Long runnerId) {
         return Result.success(errandService.listRunnerOrders(runnerId));
+    }
+
+    @Operation(summary = "从我的跑腿订单移除", description = "仅隐藏当前用户跑腿订单列表中的记录，不删除订单数据")
+    @PostMapping("/{orderNo}/hide-from-my-list")
+    public Result<Void> hideFromMyList(@PathVariable String orderNo) {
+        Long userId = BaseContext.getCurrentId();
+        if (userId == null) {
+            return Result.error("未登录");
+        }
+        errandService.hideOrderFromUser(orderNo, userId);
+        return Result.success();
+    }
+
+    @Operation(summary = "批量从我的跑腿订单移除")
+    @PostMapping("/batch-hide")
+    public Result<Void> batchHide(@RequestBody List<String> orderNos) {
+        Long userId = BaseContext.getCurrentId();
+        if (userId == null) {
+            return Result.error("未登录");
+        }
+        errandService.batchHideOrdersFromUser(orderNos, userId);
+        return Result.success();
     }
 }

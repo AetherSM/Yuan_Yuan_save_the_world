@@ -85,6 +85,25 @@ public class OrderController {
     }
 
     /**
+     * 从「我的订单」移除（仅买家视图隐藏，商家与管理端仍可看到该订单）
+     */
+    @PostMapping("/{orderNo}/hide-from-my-list")
+    @Operation(summary = "从我的订单移除", description = "仅隐藏当前用户订单列表中的记录，不删除订单数据，不影响商家")
+    public Result<Void> hideFromMyList(@PathVariable String orderNo) {
+        Long userId = requireLogin();
+        orderService.hideOrderFromBuyerList(orderNo, userId);
+        return Result.success();
+    }
+
+    @PostMapping("/batch-hide")
+    @Operation(summary = "批量从我的订单移除", description = "仅隐藏当前用户订单列表中的记录")
+    public Result<Void> batchHide(@RequestBody List<String> orderNos) {
+        Long userId = requireLogin();
+        orderService.batchHideOrdersFromBuyerList(orderNos, userId);
+        return Result.success();
+    }
+
+    /**
      * 发货（仅商家）
      * @param orderNo 订单号
      * @return 无

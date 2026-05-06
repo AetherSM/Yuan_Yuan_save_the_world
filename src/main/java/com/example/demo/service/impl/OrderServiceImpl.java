@@ -252,6 +252,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void hideOrderFromBuyerList(String orderNo, Long userId) {
+        ProductOrder order = productOrderMapper.findByOrderNo(orderNo);
+        if (order == null || !order.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("订单不存在或无权限");
+        }
+        Integer s = order.getOrderStatus();
+        if (s == null || (s != 4 && s != 5 && s != 6 && s != 7)) {
+            throw new IllegalArgumentException("仅已完成、已取消或退款相关订单可从列表移除");
+        }
+        int updated = productOrderMapper.hideFromBuyer(orderNo, userId);
+        if (updated == 0) {
+            throw new IllegalStateException("移除失败或该订单已不在列表中");
+        }
+    }
+
+    @Override
+    public void batchHideOrdersFromBuyerList(List<String> orderNos, Long userId) {
+        if (orderNos == null || orderNos.isEmpty() || userId == null) {
+            throw new IllegalArgumentException("参数错误");
+        }
+        productOrderMapper.batchHideFromBuyer(orderNos, userId);
+    }
+
+    @Override
     public List<ProductOrder> listSellerOrders(Long sellerId, Integer status) {
         return productOrderMapper.listBySeller(sellerId, status);
     }

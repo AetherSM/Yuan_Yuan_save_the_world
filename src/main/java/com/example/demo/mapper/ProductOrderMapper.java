@@ -36,5 +36,11 @@ public interface ProductOrderMapper {
     /** 列表查询：带订单商品摘要（itemSummary） */
     List<ProductOrder> listByUserWithItemSummary(@Param("userId") Long userId,
                                                  @Param("status") Integer status);
+
+    /** 买家从「我的订单」移除（软删，不影响商家） */
+    int hideFromBuyer(@Param("orderNo") String orderNo, @Param("userId") Long userId);
+
+    /** 批量移除 */
+    int batchHideFromBuyer(@Param("orderNos") List<String> orderNos, @Param("userId") Long userId);
 }
 

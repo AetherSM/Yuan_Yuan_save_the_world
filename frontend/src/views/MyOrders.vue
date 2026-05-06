@@ -1,13 +1,47 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import http from '../services/http'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 const orders = ref([])
 const loading = ref(false)
 const error = ref('')
 const userId = localStorage.getItem('userId')
 const status = ref('') // '': 全部, -1: 进行中, 4: 已完成, 5: 已取消
 const keyword = ref('')
+const selected = ref(new Set())
+
+const toggleSelect = (orderNo) => {
+  if (selected.value.has(orderNo)) {
+    selected.value.delete(orderNo)
+  } else {
+    selected.value.add(orderNo)
+  }
+}
+
+const batchHide = async () => {
+  if (selected.value.size === 0) {
+    ElMessage.warning('请选择要删除的记录')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(`确定要批量删除这 ${selected.value.size} 条跑腿订单记录吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const { data } = await http.post('/api/errands/batch-hide', Array.from(selected.value))
+    if (data && data.code === 1) {
+      ElMessage.success('批量删除成功')
+      selected.value.clear()
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '操作失败')
+    }
+  } catch (e) {
+    if (e !== 'cancel') ElMessage.error('请求失败')
+  }
+}
+
 const displayed = computed(() => {
   const kw = (keyword.value || '').trim().toLowerCase()
   const src = orders.value
@@ -84,10 +118,16 @@ const load = async () => {
 onMounted(load)
 const complete = async (orderNo) => {
   try {
-    const { data } = await http.post('/api/errands/complete', null, { params: { orderNo } })
-    if (data && data.code === 1) { ElMessage.success('已完成'); await load() }
-    else { error.value = data?.msg || '完成失败'; ElMessage.error(error.value) }
-  } catch (e) { error.value = '请求失败'; ElMessage.error(error.value) }
+    const { data } = await http.post(`/api/errands/complete?orderNo=${orderNo}`)
+    if (data && data.code === 1) {
+      ElMessage.success('订单已确认完成')
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '操作失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  }
 }
 const openReview = (orderNo) => {
   currentOrderNo.value = orderNo
@@ -123,6 +163,27 @@ const statusTagType = (s) => {
   if (s === 7 || s === 8) return 'info'
   return 'primary'
 }
+const hideOrder = async (orderNo) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条跑腿订单记录吗？删除后将不再显示，但不影响跑腿员侧。', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const { data } = await http.post(`/api/errands/${orderNo}/hide-from-my-list`)
+    if (data && data.code === 1) {
+      ElMessage.success('已从列表移除')
+      await load()
+    } else {
+      ElMessage.error(data?.msg || '操作失败')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('请求失败')
+    }
+  }
+}
+
 const canRefundErrand = (item) => [2, 3, 4].includes(item.orderStatus)
 /** 无人接单/未履约前不展示投诉（待审核、待接单、已取消、审核拒绝无投诉入口） */
 const canComplaintErrand = (item) => [2, 3, 4, 7, 8].includes(item.orderStatus)
@@ -168,11 +229,20 @@ const submitRefund = async () => {
         <option :value="5">历史-已取消</option>
       </select>
       <button class="btn gray" @click="load">刷新</button>
+      <button v-if="selected.size > 0" class="btn danger" @click="batchHide">批量删除 ({{ selected.size }})</button>
       <input class="search" v-model="keyword" placeholder="搜索订单号/标题/地址/联系人" />
     </div>
-    <div v-for="item in displayed" :key="item.orderId" class="card">
+    <div v-for="item in displayed" :key="item.orderId" class="card" :class="{ 'is-selected': selected.has(item.orderNo) }">
       <div class="row head">
-        <div class="title">{{ item.title }}</div>
+        <div class="title">
+          <el-checkbox
+            v-if="[4, 5, 6, 8].includes(item.orderStatus)"
+            :model-value="selected.has(item.orderNo)"
+            @change="toggleSelect(item.orderNo)"
+            style="margin-right: 8px"
+          />
+          {{ item.title }}
+        </div>
         <el-tag :type="statusTagType(item.orderStatus)" effect="dark" size="small">{{ statusLabel(item.orderStatus) }}</el-tag>
       </div>
       <div class="desc">{{ item.description }}</div>
@@ -191,6 +261,7 @@ const submitRefund = async () => {
         <button v-if="item.orderStatus === 4" class="btn gray" @click="openReview(item.orderNo)">评价</button>
         <button v-if="canRefundErrand(item)" class="btn warn" @click="openRefund(item)">申请退款</button>
         <button v-if="canComplaintErrand(item)" class="btn danger" @click="openComplaint(item)">投诉</button>
+        <button v-if="[4, 5, 6, 8].includes(item.orderStatus)" class="btn gray" @click="hideOrder(item.orderNo)">删除记录</button>
       </div>
     </div>
     <el-dialog v-model="complaintDialog" title="发起投诉" width="400">
@@ -238,7 +309,8 @@ const submitRefund = async () => {
 </template>
 
 <style scoped>
-.card{padding:12px;border:1px solid #eee;border-radius:8px;background:#fff;margin-bottom:10px}
+.card{padding:12px;border:1px solid #eee;border-radius:8px;background:#fff;margin-bottom:10px;transition:all 0.2s ease}
+.card.is-selected { border-color: #ef4444; background-color: #fef2f2; }
 .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
 .row.head{align-items:flex-start;gap:10px}
 .title{font-weight:600;flex:1;min-width:0}

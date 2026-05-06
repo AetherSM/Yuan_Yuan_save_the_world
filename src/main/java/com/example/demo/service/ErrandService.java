@@ -57,4 +57,14 @@ public interface ErrandService {
     List<ErrandOrder> searchErrands(Long userId, Long runnerId, Integer status);
 
     void updateErrandStatusByAdmin(Long orderId, Integer status);
+
+    /**
+     * 用户从「我的订单」中移除记录（仅隐藏用户列表，订单与跑腿员/管理侧数据保留）
+     */
+    void hideOrderFromUser(String orderNo, Long userId);
+
+    /**
+     * 批量隐藏
+     */
+    void batchHideOrdersFromUser(List<String> orderNos, Long userId);
 }

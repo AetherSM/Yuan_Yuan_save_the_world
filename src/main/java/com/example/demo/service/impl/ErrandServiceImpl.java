@@ -136,6 +136,34 @@ public class ErrandServiceImpl implements ErrandService {
         errandOrderMapper.updateStatusById(orderId, status);
     }
 
+    @Override
+    public void hideOrderFromUser(String orderNo, Long userId) {
+        if (orderNo == null || userId == null) {
+            throw new IllegalArgumentException("参数错误");
+        }
+        ErrandOrder order = errandOrderMapper.findByOrderNo(orderNo);
+        if (order == null || !order.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("订单不存在或无权限");
+        }
+        Integer s = order.getOrderStatus();
+        // 4-已完成, 5-已取消, 6-审核拒绝, 8-已退款
+        if (s == null || (s != 4 && s != 5 && s != 6 && s != 8)) {
+            throw new IllegalArgumentException("仅已完成、已取消、审核拒绝或已退款订单可从列表移除");
+        }
+        int rows = errandOrderMapper.hideFromUser(orderNo, userId);
+        if (rows == 0) {
+            throw new RuntimeException("订单不存在或已移除");
+        }
+    }
+
+    @Override
+    public void batchHideOrdersFromUser(List<String> orderNos, Long userId) {
+        if (orderNos == null || orderNos.isEmpty() || userId == null) {
+            throw new IllegalArgumentException("参数错误");
+        }
+        errandOrderMapper.batchHideFromUser(orderNos, userId);
+    }
+
     private void validateCreateOrder(ErrandOrder order) {
         if (order == null) {
             throw new IllegalArgumentException("订单信息不能为空");

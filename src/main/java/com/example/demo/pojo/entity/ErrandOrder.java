@@ -79,7 +79,10 @@ public class ErrandOrder {
     
     @Schema(description = "备注")
     private String remark;
-    
+
+    @Schema(description = "用户是否已从「我的订单」移除：0-否，1-是（仅隐藏列表，不删库，跑腿员/商家仍可见）")
+    private Integer hiddenFromUser;
+
     @Schema(description = "接单时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime acceptedAt;

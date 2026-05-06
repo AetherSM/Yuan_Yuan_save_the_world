@@ -41,6 +41,9 @@ public class ProductOrder {
     private String cancelReason;
     @Schema(description = "备注")
     private String remark;
+
+    @Schema(description = "买家是否已从「我的订单」移除：0-否，1-是（仅隐藏列表，不删库，商家仍可见）")
+    private Integer hiddenFromBuyer;
     @Schema(description = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
