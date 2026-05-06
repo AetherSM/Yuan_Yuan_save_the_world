@@ -79,7 +79,7 @@ public class ErrandController {
      * 查询待接单订单
      * @return 待接单订单列表
      */
-    @Operation(summary = "查询待接单订单", description = "获取所有状态为'待接单'的跑腿订单")
+    @Operation(summary = "查询跑腿广场订单", description = "待审核(仅展示)、待接单、以及无跑腿员的异常配送中单；不含已分配跑腿员的任务")
     @GetMapping("/open")
     public Result<List<ErrandOrder>> listOpenOrders() {
         return Result.success(errandService.listOpenOrders());
@@ -94,7 +94,7 @@ public class ErrandController {
     @GetMapping("/my")
     public Result<List<ErrandOrder>> listMyOrders(
             @Parameter(description = "用户ID", required = true) @RequestParam Long userId,
-            @Parameter(description = "订单状态: 1-待接单,2-已接单,3-配送中,4-已完成,5-已取消", required = false) @RequestParam(required = false) Integer status) {
+            @Parameter(description = "订单状态: 不传=全部; 1-待接单; 2-已接单; 3-配送中; 4-已完成; 5-已取消; -1-进行中(待审核/待接单/已接单/配送中/退款中)", required = false) @RequestParam(required = false) Integer status) {
         return Result.success(errandService.listMyOrders(userId, status));
     }
 

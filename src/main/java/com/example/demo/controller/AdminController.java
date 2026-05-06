@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +22,21 @@ public class AdminController {
     private UserService userService;
 
     @GetMapping
-    @Operation(summary = "搜索用户", description = "根据条件搜索用户列表")
+    @Operation(summary = "搜索用户", description = "根据条件搜索用户列表；若传 userId 则只返回该用户（供后台订单等按 ID 反查）")
     public Result<List<UserEntity>> searchUsers(
+            @Parameter(description = "按主键精确查询（与其它条件互斥，优先使用）") @RequestParam(required = false) Long userId,
             @Parameter(description = "关键字（手机号/昵称模糊查询，优先使用该参数）") @RequestParam(required = false) String keyword,
             @Parameter(description = "手机号") @RequestParam(required = false) String phone,
             @Parameter(description = "昵称") @RequestParam(required = false) String nickname,
             @Parameter(description = "用户类型") @RequestParam(required = false) Integer userType,
             @Parameter(description = "状态") @RequestParam(required = false) Integer status) {
+        if (userId != null) {
+            UserEntity one = userService.findById(userId);
+            if (one == null) {
+                return Result.success(Collections.emptyList());
+            }
+            return Result.success(Collections.singletonList(one));
+        }
         List<UserEntity> users;
         if (keyword != null && !keyword.trim().isEmpty()) {
             users = userService.searchUsersByKeyword(keyword.trim(), userType, status);

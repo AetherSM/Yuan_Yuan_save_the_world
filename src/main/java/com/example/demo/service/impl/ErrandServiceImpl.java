@@ -42,6 +42,16 @@ public class ErrandServiceImpl implements ErrandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void takeOrder(String orderNo, Long runnerId) {
+        ErrandOrder existing = errandOrderMapper.findByOrderNo(orderNo);
+        if (existing == null) {
+            throw new IllegalArgumentException("订单不存在");
+        }
+        if (existing.getUserId() != null && existing.getUserId().equals(runnerId)) {
+            throw new IllegalArgumentException("不能接自己发布的跑腿单");
+        }
+        if (existing.getOrderStatus() != null && existing.getOrderStatus() == 0) {
+            throw new IllegalStateException("任务尚在审核中，审核通过后才会开放接单");
+        }
         int updated = errandOrderMapper.updateStatus(orderNo, 2, runnerId);
         if (updated == 0) {
             throw new IllegalStateException("接单失败或订单已被抢走");
@@ -103,7 +113,7 @@ public class ErrandServiceImpl implements ErrandService {
 
     @Override
     public List<ErrandOrder> listOpenOrders() {
-        return errandOrderMapper.listByStatus(1);
+        return errandOrderMapper.listOpenForPlaza();
     }
 
     @Override

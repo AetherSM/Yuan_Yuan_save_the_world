@@ -129,6 +129,8 @@ onMounted(load)
           <div><b>取</b>：{{ item.pickupAddress }}</div>
           <div><b>送</b>：{{ item.deliveryAddress }}</div>
         </div>
+        <div v-if="item.acceptedAt" class="times">接单时间：{{ item.acceptedAt }}</div>
+        <div v-if="item.completedAt" class="times">完成时间：{{ item.completedAt }}</div>
         <div class="ops">
           <el-button v-if="item.orderStatus === 2" type="info" @click="startDelivery(item.orderNo)">
             开始配送
@@ -152,5 +154,6 @@ onMounted(load)
 .info{color:#888;font-size:13px;margin-bottom:8px}
 .money{color:#ef4444;font-weight:800}
 .addresses{font-size:13px;color:#374151;background:#f9fafb;padding:10px;border-radius:10px;margin-bottom:8px;border:1px dashed #e5e7eb}
+.times{font-size:12px;color:#6b7280;margin-bottom:6px}
 .ops{text-align:right;margin-top:8px}
 </style>

@@ -13,6 +13,9 @@ public interface ErrandOrderMapper {
     ErrandOrder findByOrderNo(String orderNo);
     ErrandOrder findById(@Param("orderId") Long orderId);
     List<ErrandOrder> listByStatus(Integer status);
+
+    /** 跑腿广场：待审核/待接单，以及无跑腿员的异常进行中单，供展示与重新接单 */
+    List<ErrandOrder> listOpenForPlaza();
     List<ErrandOrder> listByUser(@Param("userId") Long userId, @Param("status") Integer status);
     List<ErrandOrder> listByRunner(Long runnerId);
 

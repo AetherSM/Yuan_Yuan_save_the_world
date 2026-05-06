@@ -6,7 +6,7 @@ const orders = ref([])
 const loading = ref(false)
 const error = ref('')
 const userId = localStorage.getItem('userId')
-const status = ref('') // '': 全部, 4: 已完成, 5: 已取消
+const status = ref('') // '': 全部, -1: 进行中, 4: 已完成, 5: 已取消
 const keyword = ref('')
 const displayed = computed(() => {
   const kw = (keyword.value || '').trim().toLowerCase()
@@ -68,7 +68,7 @@ const load = async () => {
   error.value = ''
   try {
     const params = { userId }
-    if (status.value) params.status = status.value
+    if (status.value !== '' && status.value != null) params.status = status.value
     const { data } = await http.get('/api/errands/my', { params })
     if (data && data.code === 1) {
       orders.value = data.data || []
@@ -105,15 +105,27 @@ const submitReview = async () => {
 }
 
 const statusMap = {
+  0: '待审核',
   1: '待接单',
   2: '已接单',
   3: '配送中',
   4: '已完成',
   5: '已取消',
+  6: '审核拒绝',
   7: '退款中',
   8: '已退款'
 }
+const statusLabel = (s) => statusMap[s] ?? `未知状态(${s ?? '-'})`
+const statusTagType = (s) => {
+  if (s === 4) return 'success'
+  if (s === 5 || s === 6) return 'danger'
+  if (s === 0) return 'warning'
+  if (s === 7 || s === 8) return 'info'
+  return 'primary'
+}
 const canRefundErrand = (item) => [2, 3, 4].includes(item.orderStatus)
+/** 无人接单/未履约前不展示投诉（待审核、待接单、已取消、审核拒绝无投诉入口） */
+const canComplaintErrand = (item) => [2, 3, 4, 7, 8].includes(item.orderStatus)
 const refundDialog = ref(false)
 const refundForm = ref({ orderNo: '', orderType: 2, refundAmount: 0, reason: '' })
 const refundSubmitting = ref(false)
@@ -151,7 +163,7 @@ const submitRefund = async () => {
       <label>筛选：</label>
       <select v-model="status" @change="load">
         <option value="">全部</option>
-        <option :value="1">进行中</option>
+        <option :value="-1">进行中</option>
         <option :value="4">历史-已完成</option>
         <option :value="5">历史-已取消</option>
       </select>
@@ -159,20 +171,26 @@ const submitRefund = async () => {
       <input class="search" v-model="keyword" placeholder="搜索订单号/标题/地址/联系人" />
     </div>
     <div v-for="item in displayed" :key="item.orderId" class="card">
-      <div class="row">
+      <div class="row head">
         <div class="title">{{ item.title }}</div>
-        <div class="status" :class="{'done': item.orderStatus===4}">{{ statusMap[item.orderStatus] }}</div>
+        <el-tag :type="statusTagType(item.orderStatus)" effect="dark" size="small">{{ statusLabel(item.orderStatus) }}</el-tag>
       </div>
       <div class="desc">{{ item.description }}</div>
       <div class="row info">
         <span>赏金: ¥{{ item.reward }}</span>
         <span v-if="item.pickupCode">取件码: {{ item.pickupCode }}</span>
       </div>
+      <div v-if="item.runnerId && (item.runnerNickname || item.runnerPhone)" class="runner meta">
+        <span class="label">接单跑腿员：</span>
+        <span>{{ item.runnerNickname || '跑腿员' }} {{ item.runnerPhone || '' }}</span>
+      </div>
+      <div v-if="item.acceptedAt" class="meta">接单时间：{{ item.acceptedAt }}</div>
+      <div v-if="item.completedAt" class="meta">完成时间：{{ item.completedAt }}</div>
       <div class="ops">
         <button v-if="item.orderStatus === 2 || item.orderStatus === 3" class="btn" @click="complete(item.orderNo)">确认完成</button>
         <button v-if="item.orderStatus === 4" class="btn gray" @click="openReview(item.orderNo)">评价</button>
         <button v-if="canRefundErrand(item)" class="btn warn" @click="openRefund(item)">申请退款</button>
-        <button class="btn danger" @click="openComplaint(item)">投诉</button>
+        <button v-if="canComplaintErrand(item)" class="btn danger" @click="openComplaint(item)">投诉</button>
       </div>
     </div>
     <el-dialog v-model="complaintDialog" title="发起投诉" width="400">
@@ -222,9 +240,12 @@ const submitRefund = async () => {
 <style scoped>
 .card{padding:12px;border:1px solid #eee;border-radius:8px;background:#fff;margin-bottom:10px}
 .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
-.title{font-weight:600}
-.status{color:#999}
+.row.head{align-items:flex-start;gap:10px}
+.title{font-weight:600;flex:1;min-width:0}
 .desc{color:#666;font-size:14px}
+.meta{font-size:13px;color:#555;margin-top:4px}
+.runner{font-weight:500}
+.label{color:#888}
 .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
 .search{flex:1;max-width:320px;border:1px solid #e5e7eb;border-radius:8px;padding:6px}
 .ops{display:flex;gap:8px;margin-top:8px}

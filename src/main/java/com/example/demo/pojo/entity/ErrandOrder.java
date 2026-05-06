@@ -21,6 +21,12 @@ public class ErrandOrder {
     
     @Schema(description = "接单跑腿员ID")
     private Long runnerId;
+
+    @Schema(description = "接单跑腿员昵称（列表联表查询，非表字段）")
+    private String runnerNickname;
+
+    @Schema(description = "接单跑腿员手机号（列表联表查询，非表字段）")
+    private String runnerPhone;
     
     @Schema(description = "跑腿类型: 1-取快递, 2-送外卖, 3-代买, 4-其他")
     private Integer errandType; 

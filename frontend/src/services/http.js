@@ -32,16 +32,18 @@ http.interceptors.response.use(
 export default http
 
 export const getUserDetails = async (userId) => {
+  const id = userId == null || userId === '' ? null : Number(userId)
+  if (id == null || Number.isNaN(id)) return null
   try {
-    const { data } = await http.get(`/admin/users?userId=${userId}`);
+    const { data } = await http.get('/admin/users', { params: { userId: id } })
     if (data.code === 1 && data.data && data.data.length > 0) {
-      return data.data[0];
+      return data.data[0]
     }
   } catch (error) {
-    console.error(`Failed to fetch user details for ID ${userId}:`, error);
+    console.error(`Failed to fetch user details for ID ${userId}:`, error)
   }
-  return null;
-};
+  return null
+}
 
 export const searchUserIds = async (query) => {
   try {
