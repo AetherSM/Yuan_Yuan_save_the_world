@@ -70,10 +70,19 @@ public class JwtInterceptor implements HandlerInterceptor {
             String username = (String) claims.get(JwtClaimsConstant.USERNAME);
             request.setAttribute("username", username);
 
+            // 检查用户状态（是否被封禁）
+            UserEntity user = userService.findById(userId);
+            if (user == null || user.getStatus() == 0) {
+                log.info("用户已被封禁或不存在, userId={}", userId);
+                response.setStatus(403);
+                response.setContentType("application/json;charset=utf-8");
+                response.getWriter().write("{\"code\":0,\"msg\":\"账号已被封禁，请联系管理员\"}");
+                return false;
+            }
+
             // 检查管理员权限
             if (request.getRequestURI().startsWith("/admin")) {
-                UserEntity user = userService.findById(userId);
-                if (user == null || user.getUserType() != 0) {
+                if (user.getUserType() != 0) {
                     response.setStatus(403); // Forbidden
                     return false;
                 }

@@ -158,6 +158,11 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("手机号或密码错误");
         }
 
+        // 验证用户状态
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new IllegalArgumentException("账号已被封禁，请联系管理员");
+        }
+
         // 验证角色
         if (loginDTO.getUserType() != null && !loginDTO.getUserType().equals(user.getUserType())) {
             throw new IllegalArgumentException("请选择正确的角色登录");

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { ElMessageBox } from 'element-plus'
 
 const http = axios.create({
   baseURL: '',
@@ -14,9 +15,17 @@ http.interceptors.request.use(config => {
 })
 
 http.interceptors.response.use(
-  res => res,
+  res => {
+    // 处理后端返回的封禁错误码 (虽然拦截器返回了 403，但某些接口可能返回 code: 0)
+    if (res.data && res.data.code === 0 && res.data.msg === '账号已被封禁，请联系管理员') {
+      handleBannedUser()
+    }
+    return res
+  },
   err => {
-    if (err?.response?.status === 401) {
+    if (err?.response?.status === 403 && err.response.data?.msg === '账号已被封禁，请联系管理员') {
+      handleBannedUser()
+    } else if (err?.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('userId')
       localStorage.removeItem('nickname')
@@ -28,6 +37,17 @@ http.interceptors.response.use(
     return Promise.reject(err)
   }
 )
+
+function handleBannedUser() {
+  ElMessageBox.alert('账号已被封禁，请联系管理员', '账号状态异常', {
+    confirmButtonText: '确定',
+    type: 'error',
+    callback: () => {
+      localStorage.clear()
+      window.location.href = '/login'
+    }
+  })
+}
 
 export default http
 
