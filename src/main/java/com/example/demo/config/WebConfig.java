@@ -43,6 +43,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/auth/login",     // 排除登录接口
                         "/auth/register",  // 排除注册接口
                         "/auth/send-code", // 排除获取验证码接口
+                        "/auth/send-reset-code", // 排除找回密码验证码接口
+                        "/auth/reset-password", // 排除重置密码接口
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/uploads/**"      // 排除图片资源
@@ -62,4 +64,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 }
-

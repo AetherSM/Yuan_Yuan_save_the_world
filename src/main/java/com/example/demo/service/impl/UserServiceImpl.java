@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private StringRedisTemplate redisTemplate;
 
     private static final String VERIFY_CODE_KEY_PREFIX = "user:verify_code:";
+    private static final String RESET_CODE_KEY_PREFIX = "user:reset_code:";
     private static final long EXPIRE_DURATION = 5; // 5分钟有效
 
     @Override
@@ -295,5 +296,88 @@ public class UserServiceImpl implements UserService {
         String subject = "【校园购】注册验证码";
         String content = "您的验证码为：" + code + "，有效期5分钟。请勿泄露给他人。";
         mailUtil.sendTextMail(subject, content, Collections.singletonList(email));
+    }
+
+    @Override
+    public void sendResetPasswordCode(String phone, String email) {
+        if (!StringUtils.hasText(phone)) {
+            throw new IllegalArgumentException("手机号不能为空");
+        }
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("邮箱不能为空");
+        }
+        if (!phone.matches("^1[3-9]\\d{9}$")) {
+            throw new IllegalArgumentException("手机号格式不正确");
+        }
+        if (!email.matches("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$")) {
+            throw new IllegalArgumentException("邮箱格式不正确");
+        }
+
+        UserEntity user = userMapper.findByPhone(phone);
+        if (user == null) {
+            throw new IllegalArgumentException("该手机号未注册");
+        }
+        if (!email.equalsIgnoreCase(user.getEmail())) {
+            throw new IllegalArgumentException("输入邮箱与该手机号绑定邮箱不一致");
+        }
+
+        String code = String.format("%06d", new Random().nextInt(1000000));
+        String redisKey = RESET_CODE_KEY_PREFIX + email;
+        redisTemplate.opsForValue().set(redisKey, code, EXPIRE_DURATION, TimeUnit.MINUTES);
+
+        String subject = "【校园购】找回密码验证码";
+        String content = "您正在重置登录密码，验证码为：" + code + "，有效期5分钟。请勿泄露给他人。";
+        mailUtil.sendTextMail(subject, content, Collections.singletonList(email));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(String phone, String email, String code, String newPassword) {
+        if (!StringUtils.hasText(phone)) {
+            throw new IllegalArgumentException("手机号不能为空");
+        }
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("邮箱不能为空");
+        }
+        if (!StringUtils.hasText(code)) {
+            throw new IllegalArgumentException("验证码不能为空");
+        }
+        if (!StringUtils.hasText(newPassword)) {
+            throw new IllegalArgumentException("新密码不能为空");
+        }
+        if (!phone.matches("^1[3-9]\\d{9}$")) {
+            throw new IllegalArgumentException("手机号格式不正确");
+        }
+        if (!email.matches("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$")) {
+            throw new IllegalArgumentException("邮箱格式不正确");
+        }
+        if (newPassword.length() < 6 || newPassword.length() > 20) {
+            throw new IllegalArgumentException("新密码长度必须在6-20位之间");
+        }
+
+        UserEntity user = userMapper.findByPhone(phone);
+        if (user == null) {
+            throw new IllegalArgumentException("该手机号未注册");
+        }
+        if (!email.equalsIgnoreCase(user.getEmail())) {
+            throw new IllegalArgumentException("输入邮箱与该手机号绑定邮箱不一致");
+        }
+
+        String redisKey = RESET_CODE_KEY_PREFIX + email;
+        String storedCode = redisTemplate.opsForValue().get(redisKey);
+        if (storedCode == null) {
+            throw new IllegalArgumentException("验证码已过期或未获取");
+        }
+        if (!storedCode.equals(code)) {
+            throw new IllegalArgumentException("验证码错误");
+        }
+
+        String encodedPassword = MD5Util.encode(newPassword);
+        if (encodedPassword.equals(user.getPassword())) {
+            throw new IllegalArgumentException("新密码不能与原密码相同");
+        }
+
+        userMapper.updatePassword(user.getUserId(), encodedPassword);
+        redisTemplate.delete(redisKey);
     }
 }

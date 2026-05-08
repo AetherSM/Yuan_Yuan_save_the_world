@@ -63,4 +63,14 @@ public interface UserService {
      * @param email 邮箱地址
      */
     void sendVerificationCode(String email);
+
+    /**
+     * 找回密码时发送验证码
+     */
+    void sendResetPasswordCode(String phone, String email);
+
+    /**
+     * 通过手机号、邮箱和验证码重置密码
+     */
+    void resetPassword(String phone, String email, String code, String newPassword);
 }

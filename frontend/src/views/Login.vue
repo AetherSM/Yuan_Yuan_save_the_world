@@ -21,17 +21,31 @@ const regPassword = ref('')
 const regPassword2 = ref('')
 const regNickname = ref('')
 
+// 忘记密码表单
+const resetVisible = ref(false)
+const resetPhone = ref('')
+const resetEmail = ref('')
+const resetCode = ref('')
+const resetPassword = ref('')
+const resetPassword2 = ref('')
+
 const loading = ref(false)
 const codeLoading = ref(false)
 const codeCountdown = ref(0)
+const resetCodeLoading = ref(false)
+const resetCodeCountdown = ref(0)
 const message = ref('')
+const resetMessage = ref('')
 
-const startCountdown = () => {
-  if (codeCountdown.value > 0) return
-  codeCountdown.value = 60
+const phoneReg = /^1[3-9]\d{9}$/
+const emailReg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+
+const startCountdown = (target) => {
+  if (target.value > 0) return
+  target.value = 60
   const timer = setInterval(() => {
-    codeCountdown.value--
-    if (codeCountdown.value <= 0) {
+    target.value--
+    if (target.value <= 0) {
       clearInterval(timer)
     }
   }, 1000)
@@ -44,8 +58,6 @@ const sendCode = async () => {
     message.value = '请输入邮箱'
     return
   }
-  // 邮箱格式验证
-  const emailReg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
   if (!emailReg.test(regEmail.value)) {
     message.value = '邮箱格式不正确'
     return
@@ -57,7 +69,7 @@ const sendCode = async () => {
     const { data } = await http.get('/auth/send-code', { params: { email: regEmail.value } })
     if (data && data.code === 1) {
       message.value = '验证码已发送，请注意查收'
-      startCountdown()
+      startCountdown(codeCountdown)
     } else {
       message.value = data?.msg || '发送验证码失败'
     }
@@ -66,6 +78,97 @@ const sendCode = async () => {
     message.value = e?.response?.data?.msg || '发送验证码失败，请检查网络或配置'
   } finally {
     codeLoading.value = false
+  }
+}
+
+const openResetDialog = () => {
+  resetVisible.value = true
+  resetMessage.value = ''
+  resetPhone.value = loginPhone.value || ''
+}
+
+const closeResetDialog = () => {
+  resetVisible.value = false
+  resetMessage.value = ''
+  resetCodeCountdown.value = 0
+  resetPhone.value = ''
+  resetEmail.value = ''
+  resetCode.value = ''
+  resetPassword.value = ''
+  resetPassword2.value = ''
+}
+
+const sendResetCode = async () => {
+  if (resetCodeCountdown.value > 0 || resetCodeLoading.value) return
+  if (!resetPhone.value || !resetEmail.value) {
+    resetMessage.value = '请输入手机号和绑定邮箱'
+    return
+  }
+  if (!phoneReg.test(resetPhone.value)) {
+    resetMessage.value = '手机号格式不正确'
+    return
+  }
+  if (!emailReg.test(resetEmail.value)) {
+    resetMessage.value = '邮箱格式不正确'
+    return
+  }
+  resetCodeLoading.value = true
+  resetMessage.value = ''
+  try {
+    const { data } = await http.get('/auth/send-reset-code', {
+      params: { phone: resetPhone.value, email: resetEmail.value }
+    })
+    if (data && data.code === 1) {
+      resetMessage.value = '验证码已发送到绑定邮箱，请注意查收'
+      startCountdown(resetCodeCountdown)
+    } else {
+      resetMessage.value = data?.msg || '发送验证码失败'
+    }
+  } catch (e) {
+    resetMessage.value = e?.response?.data?.msg || '发送验证码失败，请检查网络或邮箱配置'
+  } finally {
+    resetCodeLoading.value = false
+  }
+}
+
+const doResetPassword = async () => {
+  if (!resetPhone.value || !resetEmail.value || !resetCode.value || !resetPassword.value || !resetPassword2.value) {
+    resetMessage.value = '请完整填写找回密码信息'
+    return
+  }
+  if (!phoneReg.test(resetPhone.value)) {
+    resetMessage.value = '手机号格式不正确'
+    return
+  }
+  if (!emailReg.test(resetEmail.value)) {
+    resetMessage.value = '邮箱格式不正确'
+    return
+  }
+  if (resetPassword.value !== resetPassword2.value) {
+    resetMessage.value = '两次输入的新密码不一致'
+    return
+  }
+  loading.value = true
+  resetMessage.value = ''
+  try {
+    const { data } = await http.post('/auth/reset-password', {
+      phone: resetPhone.value,
+      email: resetEmail.value,
+      code: resetCode.value,
+      newPassword: resetPassword.value
+    })
+    if (data && data.code === 1) {
+      loginPhone.value = resetPhone.value
+      loginPassword.value = resetPassword.value
+      message.value = '密码重置成功，请使用新密码登录'
+      closeResetDialog()
+    } else {
+      resetMessage.value = data?.msg || '密码重置失败'
+    }
+  } catch (e) {
+    resetMessage.value = e?.response?.data?.msg || '密码重置失败'
+  } finally {
+    loading.value = false
   }
 }
 
@@ -202,6 +305,9 @@ const fillTest = (phone, pwd) => {
         >
           登录
         </el-button>
+        <div class="panel-actions">
+          <button type="button" class="text-btn" @click="openResetDialog">忘记密码？</button>
+        </div>
       </div>
 
       <div v-else class="panel">
@@ -282,6 +388,60 @@ const fillTest = (phone, pwd) => {
         {{ message }}
       </div>
     </div>
+
+    <el-dialog v-model="resetVisible" title="忘记密码" width="420px" @close="closeResetDialog">
+      <div class="panel reset-panel">
+        <div class="field">
+          <label class="field-label">手机号</label>
+          <el-input v-model="resetPhone" placeholder="请输入注册手机号" class="custom-input" />
+        </div>
+        <div class="field">
+          <label class="field-label">绑定邮箱</label>
+          <el-input v-model="resetEmail" placeholder="请输入绑定邮箱" class="custom-input" />
+        </div>
+        <div class="field">
+          <label class="field-label">邮箱验证码</label>
+          <div class="code-field">
+            <el-input v-model="resetCode" placeholder="6位验证码" class="custom-input code-input" />
+            <el-button
+              type="primary"
+              class="code-btn"
+              :loading="resetCodeLoading"
+              :disabled="resetCodeCountdown > 0"
+              @click.stop.prevent="sendResetCode"
+            >
+              {{ resetCodeCountdown > 0 ? `${resetCodeCountdown}s` : '获取验证码' }}
+            </el-button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">新密码</label>
+          <el-input
+            v-model="resetPassword"
+            type="password"
+            placeholder="请输入新密码"
+            show-password
+            class="custom-input"
+          />
+        </div>
+        <div class="field">
+          <label class="field-label">确认新密码</label>
+          <el-input
+            v-model="resetPassword2"
+            type="password"
+            placeholder="请再次输入新密码"
+            show-password
+            class="custom-input"
+          />
+        </div>
+        <el-button type="primary" class="login-btn" :loading="loading" @click="doResetPassword">
+          修改密码
+        </el-button>
+        <div class="message" v-if="resetMessage" :class="{ error: resetMessage.includes('失败') || resetMessage.includes('错误') || resetMessage.includes('不') }">
+          {{ resetMessage }}
+        </div>
+      </div>
+    </el-dialog>
 
     <div class="login-footer">
       <div class="tip">测试账号可用数据库中的手机号，密码为 123456</div>
@@ -424,6 +584,10 @@ const fillTest = (phone, pwd) => {
   margin-top: 8px;
 }
 
+.reset-panel {
+  margin-top: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -467,6 +631,26 @@ const fillTest = (phone, pwd) => {
 
 .login-btn:active {
   transform: translateY(0);
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  color: #409eff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+}
+
+.text-btn:hover {
+  color: #3a8ee6;
+  text-decoration: underline;
 }
 
 .message {

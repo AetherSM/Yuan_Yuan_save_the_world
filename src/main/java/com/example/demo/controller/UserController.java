@@ -39,6 +39,19 @@ public class UserController {
         }
     }
 
+    @GetMapping("/send-reset-code")
+    @Operation(summary = "发送找回密码验证码", description = "校验手机号与绑定邮箱后，向邮箱发送找回密码验证码")
+    public Result<String> sendResetCode(@RequestParam String phone, @RequestParam String email) {
+        try {
+            userService.sendResetPasswordCode(phone, email);
+            return Result.success("验证码已发送，请查收");
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("发送失败：" + e.getMessage());
+        }
+    }
+
     /**
      * 注册用户接口
      * @param userDTO 用户注册信息
@@ -122,6 +135,24 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace(); // 打印异常堆栈
             return Result.error("登录失败：" + e.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "忘记密码重置", description = "通过手机号、绑定邮箱和验证码重置登录密码")
+    public Result<String> resetPassword(@RequestBody Map<String, String> payload) {
+        try {
+            userService.resetPassword(
+                    payload.get("phone"),
+                    payload.get("email"),
+                    payload.get("code"),
+                    payload.get("newPassword")
+            );
+            return Result.success("密码重置成功，请使用新密码登录");
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("密码重置失败：" + e.getMessage());
         }
     }
 

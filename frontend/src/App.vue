@@ -78,6 +78,7 @@ const logout = async () => {
   localStorage.removeItem('userId')
   localStorage.removeItem('nickname')
   localStorage.removeItem('userType')
+  window.hasRefreshedAuth = false
   loggedIn.value = false
   nickname.value = ''
   router.push('/login')

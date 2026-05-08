@@ -121,7 +121,7 @@ const save = async () => {
     const res = await http.put(`/addresses/${editingId.value}`, editForm.value)
     const data = res.data
     if (data && data.code === 1) {
-      editForm.value = { contactName: '', contactPhone: '', address: '', building: '', room: '' }
+      editForm.value = { contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null }
       editingId.value = null
       editVisible.value = false
       await load()
@@ -140,7 +140,7 @@ const create = async () => {
     const res = await http.post('/addresses', form.value)
     const data = res.data
     if (data && data.code === 1) {
-      form.value = { contactName: '', contactPhone: '', address: '', building: '', room: '' }
+      form.value = { contactName: '', contactPhone: '', address: '', building: '', room: '', longitude: null, latitude: null }
       await load()
       ElMessage.success('创建成功')
     } else {
