@@ -45,6 +45,7 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 value-format="YYYY-MM-DD"
+                unlink-panels
                 @change="refresh"
               />
             </div>
@@ -111,9 +112,26 @@ const renderComplaintChart = (complaints) => {
     const d = t.split(' ')[0] || '未知'
     map.set(d, (map.get(d) || 0) + 1)
   }
-  const rows = Array.from(map.entries()).sort((a, b) => a[0] > b[0] ? 1 : -1)
-  const labels = rows.map(([d]) => d)
-  const values = rows.map(([, c]) => c)
+
+  let labels = []
+  let values = []
+
+  if (complaintDateRange.value && complaintDateRange.value.length === 2) {
+    const start = new Date(complaintDateRange.value[0])
+    const end = new Date(complaintDateRange.value[1])
+    const current = new Date(start)
+    while (current <= end) {
+      const d = current.toISOString().split('T')[0]
+      labels.push(d)
+      values.push(map.get(d) || 0)
+      current.setDate(current.getDate() + 1)
+    }
+  } else {
+    const rows = Array.from(map.entries()).sort((a, b) => a[0] > b[0] ? 1 : -1)
+    labels = rows.map(([d]) => d)
+    values = rows.map(([, c]) => c)
+  }
+
   complaintChart.setOption({
     grid: { left: 40, right: 20, top: 20, bottom: 30 },
     tooltip: { trigger: 'axis' },

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -58,13 +59,19 @@ public class UserController {
     
     /**
      * 查询用户列表接口
-     * @return 所有用户列表
+     * @param keyword 关键字（手机号/昵称模糊查询）
+     * @return 过滤后的用户列表
      */
     @GetMapping("/query")
-    @Operation(summary = "查询用户列表", description = "获取所有用户列表（不含密码）")
-    public Result<List<UserEntity>> query() {
+    @Operation(summary = "查询用户列表", description = "获取用户列表（支持关键字搜索，不含密码）")
+    public Result<List<UserEntity>> query(@RequestParam(required = false) String keyword) {
         try {
-            List<UserEntity> users = userService.findAllUsers();
+            List<UserEntity> users;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                users = userService.searchUsersByKeyword(keyword.trim(), null, 1);
+            } else {
+                users = userService.findAllUsers();
+            }
             // 移除密码信息
             users.forEach(user -> user.setPassword(null));
             return Result.success(users);
@@ -147,6 +154,20 @@ public class UserController {
     @Operation(summary = "修改用户信息", description = "更新当前用户的个人信息")
     public Result<UserEntity> update(UserDTO userDTO) {
         return Result.success(new UserEntity());
+    }
+
+    @PutMapping("/password")
+    @Operation(summary = "修改密码", description = "当前登录用户修改自己的登录密码")
+    public Result<String> changePassword(@RequestAttribute("userId") Long userId,
+                                         @RequestBody Map<String, String> payload) {
+        try {
+            userService.changePassword(userId, payload.get("oldPassword"), payload.get("newPassword"));
+            return Result.success("密码修改成功");
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("密码修改失败：" + e.getMessage());
+        }
     }
 
     @PostMapping("/logout")

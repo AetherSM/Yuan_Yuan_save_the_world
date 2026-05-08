@@ -204,7 +204,8 @@ const total = () => items.value.reduce((sum, x) => {
 
     <div v-else class="page-card">
       <div class="list">
-        <div v-for="x in items" :key="x.product?.productId || x.cartItem?.productId" class="row">
+        <div v-for="(x, index) in items" :key="x.product?.productId || x.cartItem?.productId" class="row">
+          <span class="index-num">#{{ index + 1 }}</span>
           <div class="info">
             <div class="name">{{ x.product?.productName || '商品' }}</div>
             <div class="meta">
@@ -292,6 +293,7 @@ const total = () => items.value.reduce((sum, x) => {
 <style scoped>
 .list{display:flex;flex-direction:column;gap:8px}
 .row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.index-num{font-weight:bold;color:#6b7280;min-width:30px}
 .info{flex:1}
 .name{font-weight:600;color:#111827}
 .meta{color:#6b7280;font-size:12px;margin-top:4px;display:flex;gap:10px;align-items:center}

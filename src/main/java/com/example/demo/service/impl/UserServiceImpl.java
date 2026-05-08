@@ -255,6 +255,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        if (!StringUtils.hasText(oldPassword)) {
+            throw new IllegalArgumentException("原密码不能为空");
+        }
+        if (!StringUtils.hasText(newPassword)) {
+            throw new IllegalArgumentException("新密码不能为空");
+        }
+        if (newPassword.length() < 6 || newPassword.length() > 20) {
+            throw new IllegalArgumentException("新密码长度必须在6-20位之间");
+        }
+        if (oldPassword.equals(newPassword)) {
+            throw new IllegalArgumentException("新密码不能与原密码相同");
+        }
+
+        UserEntity user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在");
+        }
+
+        String encodedOldPassword = MD5Util.encode(oldPassword);
+        if (user.getPassword() == null || !user.getPassword().equals(encodedOldPassword)) {
+            throw new IllegalArgumentException("原密码错误");
+        }
+
+        userMapper.updatePassword(userId, MD5Util.encode(newPassword));
+    }
+
+    @Override
     public void sendVerificationCode(String email) {
         // 1. 生成6位数字验证码
         String code = String.format("%06d", new Random().nextInt(1000000));

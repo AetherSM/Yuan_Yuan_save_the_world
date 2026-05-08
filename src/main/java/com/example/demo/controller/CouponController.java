@@ -149,6 +149,21 @@ public class CouponController {
         return Result.success(couponService.listMyCoupons(userId, status));
     }
 
+    @Operation(summary = "删除优惠券", description = "管理员或商家删除优惠券")
+    @DeleteMapping("/{id}")
+    public Result<String> deleteCoupon(@PathVariable("id") Long couponId) {
+        Long userId = requireLogin();
+        couponService.deleteCoupon(userId, couponId);
+        return Result.success("删除成功");
+    }
+
+    @Operation(summary = "查询发放详情", description = "管理员或商家查看优惠券的发放和使用记录")
+    @GetMapping("/{id}/issuance")
+    public Result<List<UserCoupon>> listIssuanceDetails(@PathVariable("id") Long couponId) {
+        Long userId = requireLogin();
+        return Result.success(couponService.listIssuanceDetails(userId, couponId));
+    }
+
     private Long requireLogin() {
         Long userId = BaseContext.getCurrentId();
         if (userId == null) {

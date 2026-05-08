@@ -193,6 +193,48 @@ public class CouponServiceImpl implements CouponService {
         return userCouponMapper.listByUser(userId, status);
     }
 
+    @Override
+    public void deleteCoupon(Long userId, Long couponId) {
+        Coupon coupon = couponMapper.findById(couponId);
+        if (coupon == null) {
+            throw new IllegalArgumentException("优惠券不存在");
+        }
+        // 权限检查：管理员可删除任何券，商家仅能删除自己的券
+        UserEntity user = userService.findById(userId);
+        boolean isAdmin = user != null && user.getUserType() != null && user.getUserType() == 0;
+        boolean isMerchant = user != null && user.getUserType() != null && user.getUserType() == 3;
+        
+        if (isAdmin) {
+            // OK
+        } else if (isMerchant) {
+            if (coupon.getIssuerType() == null || coupon.getIssuerType() != 1 || !userId.equals(coupon.getIssuerId())) {
+                throw new IllegalArgumentException("无权删除该优惠券");
+            }
+        } else {
+            throw new IllegalArgumentException("仅管理员或商家可删除优惠券");
+        }
+        
+        couponMapper.deleteById(couponId);
+    }
+
+    @Override
+    public List<UserCoupon> listIssuanceDetails(Long userId, Long couponId) {
+        Coupon coupon = couponMapper.findById(couponId);
+        if (coupon == null) {
+            throw new IllegalArgumentException("优惠券不存在");
+        }
+        // 权限检查
+        UserEntity user = userService.findById(userId);
+        boolean isAdmin = user != null && user.getUserType() != null && user.getUserType() == 0;
+        boolean isMerchant = user != null && user.getUserType() != null && user.getUserType() == 3;
+        
+        if (!isAdmin && (!isMerchant || coupon.getIssuerType() != 1 || !userId.equals(coupon.getIssuerId()))) {
+            throw new IllegalArgumentException("无权查看该优惠券的发放详情");
+        }
+        
+        return userCouponMapper.listByCoupon(couponId);
+    }
+
     private void requireRole(Long userId, Integer expectUserType, String message) {
         UserEntity user = userService.findById(userId);
         if (user == null || user.getUserType() == null || !user.getUserType().equals(expectUserType)) {

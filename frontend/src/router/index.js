@@ -78,6 +78,14 @@ const router = createRouter({
   routes
 })
 
+const forceToLogin = (next) => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('userId')
+  localStorage.removeItem('nickname')
+  localStorage.removeItem('userType')
+  next('/login')
+}
+
 router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('token')
   const userType = Number(localStorage.getItem('userType') || 1)
@@ -91,27 +99,34 @@ router.beforeEach((to, _from, next) => {
   // 商家限制访问的页面（领取优惠券、购物记录等用户功能）
   const userOnlyPaths = ['/coupons', '/records', '/cart']
   if (userType === 3 && userOnlyPaths.includes(to.path)) {
-    next('/merchant/products')
+    forceToLogin(next)
     return
   }
   
   // 跑腿员限制访问的页面
   const runnerRestrictedPaths = ['/merchant']
   if (userType === 2 && runnerRestrictedPaths.some(path => to.path.startsWith(path))) {
-    next('/errands')
+    forceToLogin(next)
     return
   }
   
   // 普通用户限制访问商家页面
   if (userType === 1 && to.path.startsWith('/merchant')) {
-    next('/shop')
+    forceToLogin(next)
+    return
+  }
+
+  // 管理员不应进入普通用户/商家/跑腿员业务页面
+  const nonAdminPrefixes = ['/my', '/orders', '/wallet', '/addresses', '/coupons', '/records', '/cart', '/shop', '/errands', '/merchant']
+  if (userType === 0 && nonAdminPrefixes.some(path => to.path.startsWith(path))) {
+    forceToLogin(next)
     return
   }
   
   // 管理员权限检查
   if (to.meta?.requiresAdmin) {
     if (userType !== 0) {
-      next('/shop')
+      forceToLogin(next)
       return
     }
   }

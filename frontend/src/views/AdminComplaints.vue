@@ -14,6 +14,11 @@
         <el-option label="商品订单" value="1" />
         <el-option label="跑腿订单" value="2" />
       </el-select>
+      <el-select v-model="filters.complainantRole" placeholder="发起角色">
+        <el-option label="全部" value="" />
+        <el-option label="普通用户投诉" value="1" />
+        <el-option label="跑腿员举报" value="2" />
+      </el-select>
       <el-button type="primary" @click="loadComplaints">搜索</el-button>
       <el-button type="info" @click="loadStats">查看统计</el-button>
     </div>
@@ -33,19 +38,32 @@
     </div>
 
     <el-table :data="complaints" style="width: 100%">
-      <el-table-column prop="complaintId" label="ID" width="80" />
-      <el-table-column prop="orderId" label="订单ID" />
-      <el-table-column prop="orderType" label="订单类型">
+      <el-table-column type="index" label="序号" width="80" />
+      <el-table-column prop="orderId" label="关联订单" width="120" />
+      <el-table-column label="来源类型" width="120">
         <template #default="{ row }">
-          {{ row.orderType === 1 ? '商品订单' : '跑腿订单' }}
+          <el-tag :type="getOrderTypeTag(row.orderType)" effect="plain">
+            {{ getOrderTypeText(row.orderType) }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="投诉人">
+      <el-table-column label="发起人" min-width="240">
         <template #default="{ row }">
-          {{ row.complainant?.nickname }} ({{ row.complainant?.phone }})
+          <div class="complainant-cell">
+            <div class="complainant-main">
+              {{ row.complainant?.nickname || '未知用户' }}
+              <span class="muted-text">({{ row.complainant?.phone || '无手机号' }})</span>
+            </div>
+            <div class="complainant-meta">
+              <el-tag size="small" :type="getComplainantRoleTag(row.complainant?.userType)">
+                {{ getComplainantRoleText(row.complainant?.userType) }}
+              </el-tag>
+              <span class="muted-text">ID: {{ row.complainantId }}</span>
+            </div>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="reason" label="投诉原因" />
+      <el-table-column prop="reason" label="举报/投诉内容" min-width="280" show-overflow-tooltip />
       <el-table-column prop="status" label="状态">
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.status)">
@@ -74,13 +92,23 @@
           <el-form-item label="订单ID">
             {{ currentComplaint.orderId }}
           </el-form-item>
-          <el-form-item label="订单类型">
-            {{ currentComplaint.orderType === 1 ? '商品订单' : '跑腿订单' }}
+          <el-form-item label="来源类型">
+            <el-tag :type="getOrderTypeTag(currentComplaint.orderType)" effect="plain">
+              {{ getOrderTypeText(currentComplaint.orderType) }}
+            </el-tag>
           </el-form-item>
-          <el-form-item label="投诉人">
-            {{ currentComplaint.complainant?.nickname }} ({{ currentComplaint.complainant?.phone }})
+          <el-form-item label="发起人">
+            <div class="dialog-complainant">
+              <div>{{ currentComplaint.complainant?.nickname || '未知用户' }} ({{ currentComplaint.complainant?.phone || '无手机号' }})</div>
+              <div class="complainant-meta">
+                <el-tag size="small" :type="getComplainantRoleTag(currentComplaint.complainant?.userType)">
+                  {{ getComplainantRoleText(currentComplaint.complainant?.userType) }}
+                </el-tag>
+                <span class="muted-text">ID: {{ currentComplaint.complainantId }}</span>
+              </div>
+            </div>
           </el-form-item>
-          <el-form-item label="投诉原因">
+          <el-form-item label="投诉内容">
             {{ currentComplaint.reason }}
           </el-form-item>
           <el-form-item label="处理结果">
@@ -114,6 +142,7 @@ const stats = ref([])
 const filters = ref({
   status: '',
   orderType: '',
+  complainantRole: '',
 })
 
 const dialogVisible = ref(false)
@@ -140,6 +169,32 @@ const getStatusType = (status) => {
   }
 }
 
+const getOrderTypeText = (orderType) => {
+  if (orderType === 1) return '商品订单'
+  if (orderType === 2) return '跑腿订单'
+  return '未知类型'
+}
+
+const getOrderTypeTag = (orderType) => {
+  if (orderType === 1) return 'success'
+  if (orderType === 2) return 'warning'
+  return 'info'
+}
+
+const getComplainantRoleText = (userType) => {
+  if (userType === 0) return '管理员'
+  if (userType === 2) return '跑腿员'
+  if (userType === 3) return '商家'
+  return '普通用户'
+}
+
+const getComplainantRoleTag = (userType) => {
+  if (userType === 0) return 'danger'
+  if (userType === 2) return 'warning'
+  if (userType === 3) return 'success'
+  return 'info'
+}
+
 const loadComplaints = async () => {
   try {
     const params = {
@@ -149,10 +204,13 @@ const loadComplaints = async () => {
     const { data } = await http.get('/admin/complaints', { params })
     if (data.code === 1) {
       const fetchedComplaints = await Promise.all((data.data || []).map(async it => {
-        const complainant = it.complainantId ? await getUserDetails(it.complainantId) : null;
-        return { ...it, complainant };
-      }));
-      complaints.value = fetchedComplaints;
+        const complainant = it.complainantId ? await getUserDetails(it.complainantId) : null
+        return { ...it, complainant }
+      }))
+      complaints.value = fetchedComplaints.filter(it => {
+        if (!filters.value.complainantRole) return true
+        return String(it.complainant?.userType ?? '') === String(filters.value.complainantRole)
+      })
     } else {
       ElMessage.error(data.msg || '加载投诉失败')
     }
@@ -236,5 +294,29 @@ onMounted(() => {
 
 .dialog-footer {
   text-align: right;
+}
+
+.complainant-cell,
+.dialog-complainant {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.complainant-main {
+  color: #111827;
+  font-weight: 500;
+}
+
+.complainant-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted-text {
+  color: #6b7280;
+  font-size: 12px;
 }
 </style>

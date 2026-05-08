@@ -242,9 +242,9 @@ onMounted(loadCoupons)
     </div>
 
     <div v-else class="coupons-grid">
-      <div v-for="coupon in coupons" :key="coupon.couponId" class="coupon-card">
+      <div v-for="(coupon, index) in coupons" :key="coupon.couponId" class="coupon-card">
         <div class="coupon-header">
-          <div class="coupon-name">{{ coupon.name }}</div>
+          <div class="coupon-name">#{{ index + 1 }} {{ coupon.name }}</div>
           <div class="header-tags">
             <el-tag :type="getIssuerTag(coupon.issuerType)">{{ getIssuerText(coupon.issuerType) }}</el-tag>
             <el-tag :type="getStatusType(coupon.status)">{{ getStatusText(coupon.status) }}</el-tag>

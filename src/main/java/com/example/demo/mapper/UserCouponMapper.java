@@ -14,4 +14,5 @@ public interface UserCouponMapper {
     UserCoupon findUnusedByUserAndCoupon(@Param("userId") Long userId, @Param("couponId") Long couponId);
     int markUsed(@Param("id") Long id, @Param("orderId") Long orderId);
     int revertByOrderId(@Param("orderId") Long orderId);
+    List<UserCoupon> listByCoupon(Long couponId);
 }

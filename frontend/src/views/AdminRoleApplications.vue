@@ -15,7 +15,7 @@
     </div>
 
     <el-table :data="list" style="width:100%">
-      <el-table-column prop="id" label="ID" width="70" />
+      <el-table-column type="index" label="序号" width="70" />
       <el-table-column prop="userId" label="用户ID" width="90" />
       <el-table-column prop="currentType" label="当前角色" width="110">
         <template #default="{ row }">

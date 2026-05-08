@@ -14,4 +14,5 @@ public interface CouponMapper {
     List<Coupon> findByIssuer(@Param("issuerType") Integer issuerType, @Param("issuerId") Long issuerId);
     List<Coupon> findAll();
     int incrementReceiveCount(Long couponId);
+    void deleteById(Long couponId);
 }

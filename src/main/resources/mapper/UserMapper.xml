@@ -115,4 +115,10 @@
     <update id="updateUserType">
         update users set user_type = #{userType}, update_time = now() where user_id = #{userId}
     </update>
+
+    <update id="updatePassword">
+        update users
+        set password = #{password}, update_time = now()
+        where user_id = #{userId}
+    </update>
 </mapper>

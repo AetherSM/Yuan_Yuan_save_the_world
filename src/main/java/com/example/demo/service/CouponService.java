@@ -60,6 +60,16 @@ public interface CouponService {
      * @param operatorType 操作人类型（0管理员,3商家）
      */
     void distributeCoupon(Long operatorId, Integer operatorType, CouponDistributeDTO dto);
+
+    /**
+     * 删除优惠券
+     */
+    void deleteCoupon(Long userId, Long couponId);
+
+    /**
+     * 查询优惠券发放详情
+     */
+    List<UserCoupon> listIssuanceDetails(Long userId, Long couponId);
     
     /**
      * 查询我的优惠券

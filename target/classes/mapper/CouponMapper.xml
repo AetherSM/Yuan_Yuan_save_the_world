@@ -62,4 +62,8 @@
         where coupon_id = #{couponId}
           and (total_count is null or total_count = 0 or received_count &lt; total_count)
     </update>
+
+    <delete id="deleteById">
+        delete from coupons where coupon_id = #{couponId}
+    </delete>
 </mapper>

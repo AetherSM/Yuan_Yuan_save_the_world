@@ -101,7 +101,7 @@ onMounted(load)
 
     <div v-else class="page-card">
       <el-table :data="list" stripe style="width: 100%">
-        <el-table-column prop="productId" label="ID" width="70" />
+        <el-table-column type="index" label="序号" width="70" />
         <el-table-column prop="productName" label="商品名称" min-width="160" />
         <el-table-column prop="price" label="价格" width="100">
           <template #default="{ row }">

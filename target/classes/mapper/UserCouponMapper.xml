@@ -62,4 +62,8 @@
         where used_order_id = #{orderId}
           and status = 1
     </update>
+
+    <select id="listByCoupon" resultMap="BaseResultMap">
+        select * from user_coupons where coupon_id = #{couponId} order by create_time desc
+    </select>
 </mapper>

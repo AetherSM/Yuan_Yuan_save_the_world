@@ -170,9 +170,10 @@ onMounted(loadProducts)
       </div>
 
       <div v-else class="reviews-list">
-        <div v-for="review in reviews" :key="review.reviewId" class="review-card">
+        <div v-for="(review, index) in reviews" :key="review.reviewId" class="review-card">
           <div class="review-header">
             <div class="user-info">
+              <span class="index-num">#{{ index + 1 }}</span>
               <span class="user-id">用户ID: {{ review.userId }}</span>
               <el-rate :model-value="review.rating" disabled show-score />
             </div>
@@ -282,6 +283,11 @@ onMounted(loadProducts)
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+}
+.index-num {
+  font-weight: bold;
+  color: #6b7280;
+  margin-right: 8px;
 }
 .user-info { display: flex; align-items: center; gap: 12px; }
 .user-id { color: #6b7280; font-size: 14px; }

@@ -17,6 +17,7 @@
         </div>
 
         <el-table :data="productOrders" style="width: 100%">
+          <el-table-column type="index" label="序号" width="60" />
           <el-table-column prop="orderNo" label="订单号" width="170" />
           <el-table-column label="用户" width="150">
             <template #default="{ row }">
@@ -74,6 +75,7 @@
         </div>
 
         <el-table :data="errandOrders" style="width: 100%">
+          <el-table-column type="index" label="序号" width="60" />
           <el-table-column prop="orderNo" label="订单编号" width="160" />
           <el-table-column prop="title" label="标题" min-width="180" />
           <el-table-column label="用户" width="150">

@@ -15,7 +15,7 @@
     </div>
 
     <el-table :data="products" style="width: 100%">
-      <el-table-column prop="productId" label="ID" width="80" />
+      <el-table-column type="index" label="序号" width="80" />
       <el-table-column prop="productName" label="商品名称" />
       <el-table-column label="商家">
         <template #default="{ row }">

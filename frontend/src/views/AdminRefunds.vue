@@ -78,7 +78,7 @@ onMounted(load)
       <el-button type="primary" @click="load" :loading="loading">查询</el-button>
     </div>
     <el-table :data="list" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="70" />
+      <el-table-column type="index" label="序号" width="70" />
       <el-table-column prop="orderType" label="订单类型" width="100">
         <template #default="{ row }">{{ orderTypeMap[row.orderType] }}</template>
       </el-table-column>

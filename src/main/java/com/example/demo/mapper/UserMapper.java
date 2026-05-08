@@ -41,4 +41,6 @@ public interface UserMapper {
     void updateStatus(Long userId, Integer status);
 
     void updateUserType(Long userId, Integer userType);
+
+    void updatePassword(Long userId, String password);
 }

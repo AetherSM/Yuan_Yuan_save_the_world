@@ -22,6 +22,14 @@ const statusMap = {
   5: '已取消'
 }
 
+const complaintDialog = ref(false)
+const complaintSubmitting = ref(false)
+const complaintForm = ref({
+  orderId: null,
+  orderType: 2,
+  reason: ''
+})
+
 const displayList = computed(() => {
   if (activeTab.value === 'ongoing') {
     return list.value.filter(i => i.orderStatus === 2 || i.orderStatus === 3)
@@ -78,6 +86,41 @@ const startDelivery = async (orderNo) => {
     }
   } catch (e) {
     ElMessage.error('请求失败')
+  }
+}
+
+const canComplaintTask = (item) => [2, 3, 4, 5].includes(item.orderStatus)
+
+const openComplaint = (item) => {
+  complaintForm.value = {
+    orderId: item.orderId,
+    orderType: 2,
+    reason: ''
+  }
+  complaintDialog.value = true
+}
+
+const submitComplaint = async () => {
+  if (!complaintForm.value.reason.trim()) {
+    ElMessage.warning('请填写举报/投诉原因')
+    return
+  }
+  complaintSubmitting.value = true
+  try {
+    const { data } = await http.post('/api/complaints/submit', {
+      ...complaintForm.value,
+      complainantId: runnerId
+    })
+    if (data && data.code === 1) {
+      ElMessage.success('举报/投诉已提交')
+      complaintDialog.value = false
+    } else {
+      ElMessage.error(data?.msg || '提交失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  } finally {
+    complaintSubmitting.value = false
   }
 }
 
@@ -138,10 +181,30 @@ onMounted(load)
           <el-button v-if="item.orderStatus === 2 || item.orderStatus === 3" type="primary" @click="complete(item.orderNo)">
             确认送达
           </el-button>
+          <el-button v-if="canComplaintTask(item)" type="danger" plain @click="openComplaint(item)">
+            举报/投诉
+          </el-button>
           <el-tag v-if="item.orderStatus === 4" type="success">已完成</el-tag>
         </div>
       </div>
     </div>
+
+    <el-dialog v-model="complaintDialog" title="发起举报/投诉" width="420px">
+      <div class="complaint-form">
+        <p>订单标题：{{ displayList.find(it => it.orderId === complaintForm.orderId)?.title || '-' }}</p>
+        <p>原因说明：</p>
+        <el-input
+          v-model="complaintForm.reason"
+          type="textarea"
+          :rows="4"
+          placeholder="请详细描述遇到的问题，例如用户信息异常、恶意下单、沟通纠纷等"
+        />
+      </div>
+      <template #footer>
+        <el-button @click="complaintDialog = false">取消</el-button>
+        <el-button type="danger" :loading="complaintSubmitting" @click="submitComplaint">提交</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -155,5 +218,6 @@ onMounted(load)
 .money{color:#ef4444;font-weight:800}
 .addresses{font-size:13px;color:#374151;background:#f9fafb;padding:10px;border-radius:10px;margin-bottom:8px;border:1px dashed #e5e7eb}
 .times{font-size:12px;color:#6b7280;margin-bottom:6px}
-.ops{text-align:right;margin-top:8px}
+.ops{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:8px}
+.complaint-form p{margin:8px 0}
 </style>

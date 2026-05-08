@@ -77,7 +77,7 @@ const openComplaint = (o) => {
 
 const submitComplaint = async () => {
   if (!complaintForm.value.reason.trim()) {
-    ElMessage.warning('请填写投诉原因')
+    ElMessage.warning('请填写举报/投诉原因')
     return
   }
   complaintSubmitting.value = true
@@ -88,7 +88,7 @@ const submitComplaint = async () => {
       complainantId: userId
     })
     if (data && data.code === 1) {
-      ElMessage.success('投诉已提交')
+      ElMessage.success('举报/投诉已提交')
       complaintDialog.value = false
     } else {
       ElMessage.error(data?.msg || '提交失败')
@@ -346,7 +346,7 @@ const submitReview = async () => {
           <el-button v-if="o.orderStatus === 3" type="primary" size="small" @click="confirm(o.orderNo)">确认收货</el-button>
           <el-button v-if="o.orderStatus === 4" size="small" @click="openReview(o.orderNo)">评价商品</el-button>
           <el-button v-if="canRefund(o)" type="warning" size="small" plain @click="openRefund(o)">申请退款</el-button>
-          <el-button type="danger" size="small" plain @click="openComplaint(o)">投诉</el-button>
+          <el-button type="danger" size="small" plain @click="openComplaint(o)">举报/投诉</el-button>
           <el-button v-if="[4, 5, 6, 7].includes(o.orderStatus)" size="small" @click="hideOrder(o.orderNo)">删除记录</el-button>
         </div>
       </div>
@@ -358,10 +358,10 @@ const submitReview = async () => {
 
     <el-alert v-if="error" type="error" :closable="false" :title="error" class="err-alert" />
 
-    <el-dialog v-model="complaintDialog" title="发起投诉" width="420">
+    <el-dialog v-model="complaintDialog" title="发起举报/投诉" width="420">
       <div class="complaint-form">
         <p class="dialog-line">订单号：{{ displayedList.find((it) => it.orderId === complaintForm.orderId)?.orderNo }}</p>
-        <p>投诉原因：</p>
+        <p>举报/投诉原因：</p>
         <el-input v-model="complaintForm.reason" type="textarea" rows="4" placeholder="请详细描述您遇到的问题" />
       </div>
       <template #footer>

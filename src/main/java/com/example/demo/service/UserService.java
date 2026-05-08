@@ -54,6 +54,11 @@ public interface UserService {
     void updateUserType(Long userId, Integer userType);
 
     /**
+     * 修改当前用户密码
+     */
+    void changePassword(Long userId, String oldPassword, String newPassword);
+
+    /**
      * 发送邮箱验证码
      * @param email 邮箱地址
      */

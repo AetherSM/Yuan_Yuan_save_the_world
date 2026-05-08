@@ -245,9 +245,12 @@ onMounted(load)
     </el-dialog>
     <h2>我的地址</h2>
     <div class="list">
-      <div v-for="a in list" :key="a.addressId" class="item">
+      <div v-for="(a, index) in list" :key="a.addressId" class="item">
         <div class="info">
-          <div class="name">{{ a.contactName }}（{{ a.contactPhone }}）</div>
+          <div class="name">
+            <span class="index-num">#{{ index + 1 }}</span>
+            {{ a.contactName }}（{{ a.contactPhone }}）
+          </div>
           <div class="addr">{{ a.address }} {{ a.building }} {{ a.room }}</div>
         </div>
         <div class="ops">
@@ -280,6 +283,7 @@ onMounted(load)
 .list{display:flex;flex-direction:column;gap:8px}
 .item{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
 .name{font-weight:600}
+.index-num{font-weight:bold;color:#6b7280;margin-right:8px}
 .addr{color:#6b7280}
 .ops{display:flex;gap:8px;align-items:center}
 .badge{background:#42b883;color:#fff;border-radius:999px;padding:4px 8px;font-size:12px}

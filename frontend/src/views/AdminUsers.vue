@@ -18,7 +18,7 @@
     </div>
 
     <el-table :data="users" style="width: 100%">
-      <el-table-column prop="userId" label="ID" width="80" />
+      <el-table-column type="index" label="序号" width="80" />
       <el-table-column prop="nickname" label="昵称" />
       <el-table-column prop="phone" label="手机号" />
       <el-table-column prop="userType" label="角色">

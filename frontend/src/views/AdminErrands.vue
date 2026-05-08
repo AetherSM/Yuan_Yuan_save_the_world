@@ -19,6 +19,7 @@
     </div>
 
     <el-table :data="errands" style="width: 100%">
+      <el-table-column type="index" label="序号" width="60" />
       <el-table-column prop="orderNo" label="订单编号" />
       <el-table-column prop="title" label="任务标题" />
       <el-table-column label="用户">

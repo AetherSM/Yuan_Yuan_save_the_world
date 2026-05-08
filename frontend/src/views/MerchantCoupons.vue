@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import http from '../services/http'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const coupons = ref([])
 const loading = ref(false)
@@ -9,9 +9,13 @@ const error = ref('')
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const distributeVisible = ref(false)
+const issuanceVisible = ref(false)
+const issuanceList = ref([])
+const userOptions = ref([])
+const userSearchLoading = ref(false)
 const distributeForm = ref({
   couponId: null,
-  userIdsText: ''
+  userIds: []
 })
 
 // 表单数据
@@ -52,6 +56,28 @@ const loadCoupons = async () => {
     error.value = '请求失败'
   } finally {
     loading.value = false
+  }
+}
+
+// 远程搜索用户
+const searchUsers = async (query) => {
+  const q = (query || '').trim()
+  if (!q) {
+    userOptions.value = []
+    return
+  }
+  userSearchLoading.value = true
+  try {
+    const { data } = await http.get('/auth/query', { params: { keyword: q } })
+    if (data && data.code === 1) {
+      userOptions.value = (data.data || []).slice(0, 50)
+    } else {
+      userOptions.value = []
+    }
+  } catch (e) {
+    userOptions.value = []
+  } finally {
+    userSearchLoading.value = false
   }
 }
 
@@ -144,27 +170,59 @@ const submitForm = async () => {
   }
 }
 
+const handleDelete = async (coupon) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这张优惠券吗？删除后用户已领取的券仍可使用，但不再发放。', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const { data } = await http.delete(`/api/coupons/${coupon.couponId}`)
+    if (data && data.code === 1) {
+      ElMessage.success('删除成功')
+      await loadCoupons()
+    } else {
+      ElMessage.error(data?.msg || '删除失败')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('请求失败')
+    }
+  }
+}
+
+const openIssuanceDialog = async (coupon) => {
+  try {
+    const { data } = await http.get(`/api/coupons/${coupon.couponId}/issuance`)
+    if (data && data.code === 1) {
+      issuanceList.value = data.data || []
+      issuanceVisible.value = true
+    } else {
+      ElMessage.error(data?.msg || '获取发放详情失败')
+    }
+  } catch (e) {
+    ElMessage.error('请求失败')
+  }
+}
+
 const openDistributeDialog = (coupon) => {
   distributeForm.value = {
     couponId: coupon.couponId,
-    userIdsText: ''
+    userIds: []
   }
+  userOptions.value = []
   distributeVisible.value = true
 }
 
 const submitDistribute = async () => {
-  const ids = (distributeForm.value.userIdsText || '')
-    .split(/[,\n，\s]+/)
-    .map(x => Number(x.trim()))
-    .filter(x => Number.isFinite(x) && x > 0)
-  if (!ids.length) {
-    ElMessage.warning('请输入至少一个用户ID')
+  if (!distributeForm.value.userIds.length) {
+    ElMessage.warning('请选择至少一个用户')
     return
   }
   try {
     const { data } = await http.post('/api/coupons/merchant/distribute', {
       couponId: distributeForm.value.couponId,
-      userIds: ids
+      userIds: distributeForm.value.userIds
     })
     if (data && data.code === 1) {
       ElMessage.success('发放成功')
@@ -201,7 +259,9 @@ const formatDate = (dateStr) => {
   return date.toLocaleString('zh-CN')
 }
 
-onMounted(loadCoupons)
+onMounted(() => {
+  loadCoupons()
+})
 </script>
 
 <template>
@@ -228,9 +288,9 @@ onMounted(loadCoupons)
     </div>
 
     <div v-else class="coupons-grid">
-      <div v-for="coupon in coupons" :key="coupon.couponId" class="coupon-card">
+      <div v-for="(coupon, index) in coupons" :key="coupon.couponId" class="coupon-card">
         <div class="coupon-header">
-          <div class="coupon-name">{{ coupon.name }}</div>
+          <div class="coupon-name">#{{ index + 1 }} {{ coupon.name }}</div>
           <el-tag :type="getStatusType(coupon.status)">{{ getStatusText(coupon.status) }}</el-tag>
         </div>
         
@@ -266,6 +326,8 @@ onMounted(loadCoupons)
         <div class="coupon-actions">
           <el-button size="small" @click="openEditDialog(coupon)">编辑</el-button>
           <el-button size="small" type="primary" plain @click="openDistributeDialog(coupon)">发放</el-button>
+          <el-button size="small" type="info" plain @click="openIssuanceDialog(coupon)">记录</el-button>
+          <el-button size="small" type="danger" plain @click="handleDelete(coupon)">删除</el-button>
         </div>
       </div>
     </div>
@@ -325,19 +387,65 @@ onMounted(loadCoupons)
         <el-form-item label="优惠券ID">
           <el-input :model-value="distributeForm.couponId" disabled />
         </el-form-item>
-        <el-form-item label="用户ID列表" required>
-          <el-input
-            v-model="distributeForm.userIdsText"
-            type="textarea"
-            :rows="6"
-            placeholder="请输入用户ID，支持英文逗号、中文逗号、空格或换行分隔"
-          />
+        <el-form-item label="选择用户" required>
+          <el-select
+            v-model="distributeForm.userIds"
+            multiple
+            filterable
+            remote
+            :remote-method="searchUsers"
+            :loading="userSearchLoading"
+            placeholder="输入手机号/昵称搜索并选择用户"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="u in userOptions"
+              :key="u.userId"
+              :label="`${u.nickname || '用户'}（${u.phone || '无手机号'}）ID:${u.userId}`"
+              :value="u.userId"
+            />
+          </el-select>
+          <div class="form-tip">支持按手机号或昵称搜索；可多选。</div>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="distributeVisible = false">取消</el-button>
           <el-button type="primary" @click="submitDistribute">确认发放</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 发放详情对话框 -->
+    <el-dialog v-model="issuanceVisible" title="发放记录" width="700px">
+      <el-table :data="issuanceList" stripe style="width: 100%" max-height="400">
+        <el-table-column type="index" label="序号" width="70" />
+        <el-table-column prop="createTime" label="领取时间">
+          <template #default="{ row }">
+            {{ formatDate(row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="使用状态">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'warning'">
+              {{ row.status === 1 ? '已使用' : '未使用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="usedTime" label="使用时间">
+          <template #default="{ row }">
+            {{ row.usedTime ? formatDate(row.usedTime) : '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="usedOrderId" label="关联订单" width="120">
+          <template #default="{ row }">
+            {{ row.usedOrderId || '-' }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="issuanceVisible = false">关闭</el-button>
         </span>
       </template>
     </el-dialog>
